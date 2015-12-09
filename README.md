@@ -2,11 +2,6 @@
 
 A webapp to create and control your horde of Slack Bots.
 
-## File structure
-
-The root directory contains the "working" directory where the build processes and source files live. The *app* directory contains the front-end Angular webapp, and the *test* directory contains Karma unit tests.
-
-The *dist* directory contains the Node back-end (in the *models* directory and the *index.js* entry point) as well as the production files in the *public* directory. Distribution config files (`Dockerfile` and `Vagrantfile`) are stored here as well. See below for information on deployment.
 
 ## Get started
 
@@ -43,19 +38,17 @@ To destroy and remove the slackbots Docker image,
 
 If you want to make changes to the webapp, you can download the source and deploy locally to a Vagrant VM
 
-1. Clone the repository
-
     git clone git@github.com:gpanders/slackbots.git
-
-2. Make sure you have all of the required dependencies
-
     npm install && bower install
-
-3. Build the project
-
     grunt
 
-## Deploy to Vagrant
+### File structure
+
+The root directory contains the "working" directory where the build processes and source files live. The **app** directory contains the front-end Angular webapp, and the **test** directory contains Karma unit tests.
+
+The **dist** directory contains the Node back-end (in the **models** directory and the **index.js** entry point) as well as the Grunt-generated production files in the **public** directory. Distribution config files (`Dockerfile` and `Vagrantfile`) are stored here as well. See below for information on deployment.
+
+### Deploy to Vagrant
 
 Requires [Vagrant](http://vagrantup.com) to be installed.
 
