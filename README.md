@@ -8,35 +8,13 @@ The root directory contains the "working" directory where the build processes an
 
 The *dist* directory contains the Node back-end (in the *models* directory and the *index.js* entry point) as well as the production files in the *public* directory. Distribution config files (`Dockerfile` and `Vagrantfile`) are stored here as well. See below for information on deployment.
 
-## Build
+## Get started
 
-Make sure you have all of the required dependencies
+The fastest way to get this webapp up and running is to use Docker. There is already a Docker image available on Docker Hub that you can get started in one command (assuming you already have [Docker](http://docker.com) installed).
 
-    npm install && bower install
-
-Run `grunt` or `grunt build` for building and `grunt serve` for preview.
-
-## Deploy to Vagrant
-
-Run `grunt` or `grunt build` to build the production files, then
-
-    cd dist && npm install
-    vagrant up
-    vagrant ssh -- node /vagrant/index.js
-
-The Vagrant VM forwards localhost port 9000 to the VM, so you can access the site at `localhost:9000`
-
-## Deploy to Docker
-
-*NOTE:* You must have a Mongo DB docker container running to connect to before starting the slackbots Docker container
+**NOTE:** You must have a Mongo DB Docker container running to connect to before starting the slackbots Docker container
 
     docker run --name mongo -v /data/db:/data/db -d mongo
-
-If you want to create a local Docker version, follow the steps below. Otherwise, skip this step to use the image on Docker Hub.
-
-    grunt
-    cd dist
-    docker build -t ganders/slackbots .
 
 To start the Docker container
 
@@ -60,6 +38,34 @@ To destroy and remove the slackbots Docker image,
 
     docker kill slackbots
     docker rm slackbots
+
+## Source
+
+If you want to make changes to the webapp, you can download the source and deploy locally to a Vagrant VM
+
+1. Clone the repository
+
+    git clone git@github.com:gpanders/slackbots.git
+
+2. Make sure you have all of the required dependencies
+
+    npm install && bower install
+
+3. Build the project
+
+    grunt
+
+## Deploy to Vagrant
+
+Requires [Vagrant](http://vagrantup.com) to be installed.
+
+Spin up a Vagrant VM and the run the webapp inside the VM
+
+    cd dist && npm install
+    vagrant up
+    vagrant ssh -- node /vagrant/index.js
+
+The Vagrant VM forwards localhost port 9000 to the VM, so you can access the site at `localhost:9000`
 
 ## Testing
 
