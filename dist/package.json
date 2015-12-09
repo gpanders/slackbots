@@ -1,0 +1,26 @@
+{
+  "name": "slackbots",
+  "version": "1.0.0",
+  "description": "slackbots webapp",
+  "main": "index.js",
+  "dependencies": {
+    "body-parser": "^1.14.0",
+    "cookie-session": "^1.2.0",
+    "express": "^4.13.3",
+    "mongoose": "^4.1.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Greg Anders",
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/ganders/slackbots.git"
+  },
+  "license": "ISC",
+  "bugs": {
+    "url": "https://gitlab.com/ganders/slackbots/issues"
+  },
+  "homepage": "https://gitlab.com/ganders/slackbots#README"
+}

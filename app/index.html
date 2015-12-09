@@ -1,0 +1,117 @@
+<!doctype html>
+<html ng-app="slackbotsApp">
+  <head>
+    <meta charset="utf-8">
+    <title>Slackbots</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+    <!-- build:css(.) styles/vendor.css -->
+    <!-- bower:css -->
+    <!-- endbower -->
+    <!-- endbuild -->
+    <!-- build:css(.tmp) styles/main.css -->
+    <link rel="stylesheet" href="styles/main.css">
+    <!-- endbuild -->
+  </head>
+  <body ng-controller="MainCtrl" >
+    <!--[if lte IE 8]>
+      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
+    <![endif]-->
+
+    <!-- Add your site or application content here -->
+    <div class="header">
+      <div class="navbar navbar-default" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="#/">slackbots</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="_hidden" ng-show="loaded">
+        <div class="row text-center form-group form-inline">
+            <div class="col-md-3"></div>
+            <div class="col-md-6" ng-hide="user">
+                <label>Token
+                    <input
+                        class="form-control"
+                        name="token" id="token-input"
+                        size="45"
+                        placeholder="Enter your Slack token here..."
+                        ng-model="token"
+                    />
+                </label>
+                <button class="btn btn-sm btn-primary" ng-click="checkToken(token)">Submit</button>
+            </div>
+            <div class="col-md-6" ng-show="user">
+                <h4>Logged in as @{{user.username}}</h4>
+                <button class="btn btn-sm btn-default" ng-click="signOut()">Sign Out</button>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 text-center" ng-class="{ 'has-success': user, 'has-error': !user }" ng-show="authMessage"><label class="control-label" ng-bind="authMessage"></label></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="container">
+        <div ui-view></div>
+    </div>
+
+    <div id="edit-image-modal" class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+                    <h4 class="modal-title">Edit Image URL</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <input
+                            type="text"
+                            name="imageUrl" id="image-url-input"
+                            class="form-control"
+                            placeholder="Image URL..."
+                            ng-model="imageUrlValue "/>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="modalSubmit()">Remove Image</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" data-dismiss="modal" ng-click="modalSubmit(imageUrlValue)">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- build:js(.) scripts/vendor.js -->
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    <script src="bower_components/angular-ui-router/release/angular-ui-router.js"></script>
+    <script src="bower_components/jquery-ui/jquery-ui.js"></script>
+    <script src="bower_components/angular-ui-sortable/sortable.js"></script>
+    <script src="bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.js"></script>
+    <!-- endbower -->
+    <!-- endbuild -->
+
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="scripts/app.js"></script>
+    <script src="scripts/controllers/main.js"></script>
+    <script src="scripts/controllers/bots.js"></script>
+    <script src="scripts/services/SlackFactory.js"></script>
+    <script src="scripts/services/BotFactory.js"></script>
+    <!-- endbuild -->
+
+    <script type="text/javascript">
+      (function($) {
+        $(document).ready(function() {
+          $('._hidden').removeClass('_hidden');
+        });
+      })(jQuery);
+    </script>
+</body>
+</html>
