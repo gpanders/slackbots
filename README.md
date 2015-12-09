@@ -4,7 +4,6 @@ A webapp to create and control your horde of Slack Bots.
 
 You will need a Slack API token which you can get [here](https://api.slack.com/web).
 
-
 ## Get started
 
 The fastest way to get this webapp up and running is to use Docker. There is already a Docker image available on Docker Hub that you can get started in one command (assuming you already have [Docker](http://docker.com) installed).
@@ -31,16 +30,21 @@ And to resume it again,
 
     docker start slackbots
 
-To destroy and remove the slackbots Docker image,
+To destroy and remove the slackbots Docker container,
 
     docker kill slackbots
     docker rm slackbots
+
+And to completely remove the local Docker image,
+
+    docker rmi ganders/slackbots
 
 ## Source
 
 If you want to make changes to the webapp, you can download the source and deploy locally to a Vagrant VM
 
     git clone git@github.com:gpanders/slackbots.git
+    cd slackbots
     npm install && bower install
     grunt
 
