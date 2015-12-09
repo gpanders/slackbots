@@ -2,6 +2,8 @@
 
 A webapp to create and control your horde of Slack Bots.
 
+You will need a Slack API token which you can get [here](https://api.slack.com/web).
+
 
 ## Get started
 
