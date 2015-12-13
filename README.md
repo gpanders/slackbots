@@ -10,7 +10,8 @@ The fastest way to get this webapp up and running is to use Docker. There is alr
 
 **NOTE:** You must have a Mongo DB Docker container running to connect to before starting the slackbots Docker container
 
-    docker run --name mongo -v /data/db:/data/db -d mongo
+    docker create volume --name mongo-data
+    docker run --name mongo -v mongo-data:/data/db -d mongo
 
 To start the Docker container
 
