@@ -1,6 +1,0 @@
-node_modules/
-Vagrantfile
-Dockerfile
-bootstrap.sh
-.dockerignore
-.vagrant/
