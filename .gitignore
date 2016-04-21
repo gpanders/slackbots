@@ -1,9 +1,8 @@
 node_modules/
-.tmp
 .sass-cache
-bower_components
 .editorconfig
 .gitattributes
 .env
 *.log
 
+public/assets/

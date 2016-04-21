@@ -1,8 +1,7 @@
 'use strict';
 
-angular
-.module('slackbotsApp')
-.controller('MainCtrl', function($rootScope, $scope, $cookies, $state, SlackFactory) {
+module.exports = angular.module('slackbots.homeCtrl', [])
+.controller('HomeCtrl', function($rootScope, $scope, $state, SlackFactory, TokenService) {
     $scope.loaded = false;
     $scope.bots = [];
 
@@ -10,7 +9,7 @@ angular
         SlackFactory.authorize(token).then(
             function(user) {
                 $rootScope.user = user;
-                $cookies.put('slackbotsAppToken', token);
+                TokenService.save(token);
                 $scope.authMessage = 'Authorized! Loading bots...';
                 $scope.loaded = true;
 
@@ -21,7 +20,7 @@ angular
 
             },
             function(err) {
-                $cookies.remove('slackbotsAppToken');
+                TokenService.clear();
                 delete $rootScope.user;
                 $scope.authMessage = 'Authorization failed: ' + err;
                 $scope.loaded = true;
@@ -30,7 +29,7 @@ angular
     };
 
     $scope.signOut = function() {
-        $cookies.remove('slackbotsAppToken');
+        TokenService.clear();
         $scope.bots = [];
         delete $rootScope.user;
         $state.go('default');
@@ -53,7 +52,7 @@ angular
         }
     };
 
-    var token = $cookies.get('slackbotsAppToken');
+    var token = TokenService.get();
     if (token) {
         $scope.checkToken(token);
     } else {

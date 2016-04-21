@@ -1,15 +1,6 @@
 'use strict';
 
-/**
- * @ngdoc function
- * @name slackbotsApp.controller:BotsCtrl
- * @description
- * # BotsCtrl
- * Controller of the slackbotsApp
- */
-
-angular
-.module('slackbotsApp')
+module.exports = angular.module('slackbots.botsCtrl', [])
 .controller('BotsCtrl', function($rootScope, $scope, $http, $q, BotFactory, SlackFactory, user, bots, users, channels, groups) {
     $scope.sortOpts = {
         stop: function() {
@@ -43,7 +34,9 @@ angular
     };
 
     $scope.save = function(bot) {
-        if (bot.isUser) return;
+        if (bot.isUser) {
+            return;
+        }
 
         BotFactory.update(bot).then(
             function() {},
@@ -121,8 +114,8 @@ angular
     };
 
     function updateIndices(bot, i) {
-        if (bot.index != i) {
-            bot.index = i;
+        if (bot.index !== +i) {
+            bot.index = +i;
             $scope.save(bot);
         }
     }

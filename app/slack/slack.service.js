@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('slackbotsApp')
+module.exports = angular.module('slackbots.slackService', [])
 .factory('SlackFactory', function($http, $rootScope, $q) {
     var service = {};
 
@@ -17,7 +17,7 @@ angular.module('slackbotsApp')
                     var user = {};
                     user.token = token;
                     user.username = res.data.user;
-                    user.id = res.data.user_id;
+                    user.id = res.data['user_id'];
                     deferred.resolve(user);
                 } else {
                     deferred.reject('Invalid token');
@@ -52,8 +52,8 @@ angular.module('slackbotsApp')
                 if (res.data.ok) {
                     var profile = res.data.user.profile;
                     var info = {};
-                    info.realName = profile.real_name;
-                    info.imageUrl = profile.image_original;
+                    info.realName = profile['real_name'];
+                    info.imageUrl = profile['image_original'];
                     deferred.resolve(info);
                 } else {
                     deferred.reject('Slack denied our request for user info');
@@ -151,7 +151,7 @@ angular.module('slackbotsApp')
             }).then(function(res) {
                 if (res.data.ok) {
                     res.data.members
-                        .filter(function(member) { return !member.deleted && !member.is_bot; })
+                        .filter(function(member) { return !member.deleted && !member['is_bot']; })
                         .forEach(function(member) { users[member.id] = { name: '@' + member.name }; });
 
                     $http({
@@ -160,7 +160,7 @@ angular.module('slackbotsApp')
                     }).then(function(res) {
                         if (res.data.ok) {
                             res.data.ims
-                                .filter(function(im) { return im.is_im && !im.is_user_deleted && users[im.user]; })
+                                .filter(function(im) { return im['is_im'] && !im['is_user_deleted'] && users[im.user]; })
                                 .forEach(function(im) { users[im.user].im = im.id; });
 
                             deferred.resolve(users);
@@ -184,7 +184,7 @@ angular.module('slackbotsApp')
             }).then(function(res) {
                 if (res.data.ok) {
                     res.data.channels
-                       .filter(function(channel) { return channel.is_channel && channel.is_member; })
+                       .filter(function(channel) { return channel['is_channel'] && channel['is_member']; })
                        .forEach(function(channel) { channels[channel.id] = '#' + channel.name; });
 
                     deferred.resolve(channels);
@@ -202,7 +202,7 @@ angular.module('slackbotsApp')
             }).then(function(res) {
                 if (res.data.ok) {
                     res.data.groups
-                        .filter(function(group) { return group.is_group && !group.is_archived; })
+                        .filter(function(group) { return group['is_group'] && !group['is_archived']; })
                         .forEach(function(group) { groups[group.id] = group.name; });
 
                     deferred.resolve(groups);

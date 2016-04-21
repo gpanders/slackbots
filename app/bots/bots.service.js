@@ -1,6 +1,6 @@
 'use strict';
 
-angular.module('slackbotsApp')
+module.exports = angular.module('slackbots.botsFactory', [])
 .factory('BotFactory', function($rootScope, $http, $q) {
     var service = {};
 
