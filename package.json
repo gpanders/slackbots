@@ -1,7 +1,20 @@
 {
   "name": "slackbots",
   "private": true,
-  "devDependencies": {
+  "engines": {
+    "node": "5.3.0"
+  },
+  "scripts": {
+    "start": "node dist/index.js",
+    "postinstall": "npm run build",
+    "test": "grunt test",
+    "build": "grunt build"
+  },
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "cookie-session": "^2.0.0-alpha.1",
+    "express": "^4.13.4",
+    "mongoose": "^4.4.12",
     "grunt": "^0.4.5",
     "grunt-angular-templates": "^0.5.7",
     "grunt-autoprefixer": "^2.0.0",
@@ -34,20 +47,5 @@
     "karma-phantomjs-launcher": "*",
     "phantomjs": "^1.9.19",
     "time-grunt": "^1.0.0"
-  },
-  "engines": {
-    "node": "5.3.0"
-  },
-  "scripts": {
-    "start": "node dist/index.js",
-    "postinstall": "npm run build",
-    "test": "grunt test",
-    "build": "grunt build"
-  },
-  "dependencies": {
-    "body-parser": "^1.15.0",
-    "cookie-session": "^2.0.0-alpha.1",
-    "express": "^4.13.4",
-    "mongoose": "^4.4.12"
   }
 }
