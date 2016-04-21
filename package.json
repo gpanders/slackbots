@@ -38,10 +38,14 @@
     "node": "5.3.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "test": "grunt test"
+    "start": "npm run build && node dist/index.js",
+    "test": "grunt test",
+    "build": "grunt build"
   },
   "dependencies": {
-    "express": "^4.13.3"
+    "body-parser": "^1.15.0",
+    "cookie-session": "^2.0.0-alpha.1",
+    "express": "^4.13.4",
+    "mongoose": "^4.4.12"
   }
 }

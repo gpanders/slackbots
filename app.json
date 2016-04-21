@@ -3,7 +3,7 @@
   "scripts": {
   },
   "env": {
-    "MONGOLAB_URI": {
+    "MONGO_URI": {
       "required": true
     }
   },
