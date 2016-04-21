@@ -5,7 +5,8 @@
   "env": {
     "MONGO_URI": {
       "required": true
-    }
+    },
+    "NODE_ENV": "dev"
   },
   "formation": {
     "web": {
