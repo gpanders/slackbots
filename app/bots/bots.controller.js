@@ -19,11 +19,9 @@ export class BotsCtrl {
     }
 
     newBot() {
-        this.UserService.getUser().then(user => {
-            let newBot = { userId: user.id, botname: 'NewBot', index: 0 };
-            this.BotsService.create(newBot).then(bot => this.bots.unshift(bot), res => {
-                console.error('Failed to add new bot', res);
-            });
+        let newBot = { botname: 'NewBot', index: 0 };
+        this.BotsService.create(newBot).then(() => {}, res => {
+            console.error('Failed to add new bot', res);
         });
     }
 
