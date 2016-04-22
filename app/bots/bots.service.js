@@ -15,7 +15,7 @@ export class BotsService {
         this.bots.forEach((bot, i) => {
             if (bot.index !== +i) {
                 bot.index = +i;
-                this.save(bot);
+                this.update(bot);
             }
         });
     }

@@ -1,22 +1,19 @@
 'use strict';
 
-export default class FocusOn {
-    /*@ngInject*/
-    constructor($timeout) {
-        this.$timeout = $timeout;
-
-        this.restrict = 'A';
-    }
-
-    link(scope, element, attr) {
-        scope.$watch(attr.focusOn, val => {
-            this.$timeout(() => {
-                if (val) {
-                    element.focus();
-                } else {
-                    element.blur();
-                }
+export default function($timeout) {
+    'ngInject';
+    return {
+        restrict: 'A',
+        link: (scope, element, attr) => {
+            scope.$watch(attr.focusOn, val => {
+                $timeout(() => {
+                    if (val) {
+                        element.focus();
+                    } else {
+                        element.blur();
+                    }
+                });
             });
-        });
-    }
+        }
+    };
 }
