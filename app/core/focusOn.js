@@ -1,6 +1,6 @@
 'use strict';
 
-export class FocusOn {
+export default class FocusOn {
     /*@ngInject*/
     constructor($timeout) {
         this.$timeout = $timeout;

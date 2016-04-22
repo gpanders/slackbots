@@ -6,6 +6,8 @@ import Home from './home/home.component';
 import User from './user/user.component';
 import Bots from './bots/bots.component';
 
+import FocusOn from './core/focusOn';
+
 import BotsState from './bots/bots.state';
 
 module.exports = angular.module('slackbots', [
@@ -31,4 +33,5 @@ module.exports = angular.module('slackbots', [
             template: ''
         })
         .state('bots', BotsState);
-});
+})
+.directive('focusOn', FocusOn);
