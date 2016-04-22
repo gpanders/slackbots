@@ -1,6 +1,5 @@
 {
     "bitwise": true,
-    "camelcase": true,
     "curly": true,
     "eqeqeq": true,
     "esversion": 6,
@@ -51,6 +50,7 @@
 
     "browser": true,
     "node": true,
+    "devel": true,
 
     "globals": {
         "angular": false,

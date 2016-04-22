@@ -1,23 +1,20 @@
 'use strict';
 
-module.exports = angular.module('slackbots.tokenService', [])
-.factory('TokenStore', function(store) {
-    return store.getNamespacedStore('slackbots');
-})
-.factory('TokenService', function(TokenStore) {
-    var s = {};
+export class TokenService {
+    /*@ngInject*/
+    constructor(store) {
+        this.store = store.getNamespacedStore('slackbots');
+    }
 
-    s.get = function() {
-        return TokenStore.get('token');
-    };
+    get() {
+        return this.store.get('token');
+    }
 
-    s.save = function(token) {
-        return TokenStore.set('token', token);
-    };
+    save(token) {
+        return this.store.set('token', token);
+    }
 
-    s.clear = function() {
-        return TokenStore.remove('token');
-    };
-
-    return s;
-});
+    clear() {
+        return this.store.remove('token');
+    }
+}

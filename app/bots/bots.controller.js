@@ -1,123 +1,94 @@
 'use strict';
 
-module.exports = angular.module('slackbots.botsCtrl', [])
-.controller('BotsCtrl', function($rootScope, $scope, $http, $q, BotFactory, SlackFactory, user, bots, users, channels, groups) {
-    $scope.sortOpts = {
-        stop: function() {
-            $scope.bots.forEach(updateIndices);
-        }
-    };
+export class BotsCtrl {
+    /*@ngInject*/
+    constructor($q, BotsService, UserService, SlackService) {
+        this.$q = $q;
+        this.BotsService = BotsService;
+        this.UserService = UserService;
+        this.SlackService = SlackService;
 
-    $scope.bots = bots;
-    $scope.users = users;
-    $scope.channels = channels;
-    $scope.groups = groups;
+        BotsService.getAll().then(bots => this.bots = bots);
+        SlackService.getData('users').then(users => this.users = users);
+        SlackService.getData('groups').then(groups => this.groups = groups);
+        SlackService.getData('channels').then(channels => this.channels = channels);
 
-    $scope.bots.unshift({
-        isUser: true,
-        botname: user.realName,
-        imageUrl: user.imageUrl
-    });
+        this.sortOpts = {
+            stop: () => this.BotsService.updateIndices()
+        };
+    }
 
-    $scope.newBot = function() {
-        var newBot = { userId: $rootScope.user.id, botname: 'NewBot', index: 0 };
-        BotFactory.create(newBot).then(
-            function(bot) {
-                $scope.bots.unshift(bot);
-                $scope.bots.forEach(updateIndices);
-            },
-            function(res) {
-                console.error('Failed to add new bot');
-                console.error(res);
-            }
-        );
-    };
+    newBot() {
+        this.UserService.getUser().then(user => {
+            let newBot = { userId: user.id, botname: 'NewBot', index: 0 };
+            this.BotsService.create(newBot).then(bot => this.bots.unshift(bot), res => {
+                console.error('Failed to add new bot', res);
+            });
+        });
+    }
 
-    $scope.save = function(bot) {
+    save(bot) {
         if (bot.isUser) {
             return;
         }
 
-        BotFactory.update(bot).then(
-            function() {},
-            function(res) {
-                console.error('Failed to save bot');
-                console.error(res);
-            }
-        );
-    };
+        this.BotsService.update(bot).then(() => {}, res => {
+            console.error('Failed to save bot', res);
+        });
+    }
 
-    $scope.delete = function(bot) {
+    delete(bot) {
         if (confirm('Are you sure you want to delete this bot?')) {
-            BotFactory.delete(bot._id).then(
-                function() {
-                    var pos = $scope.bots.indexOf(bot);
-                    $scope.bots.splice(pos, 1);
-                },
-                function(res) {
-                    console.error('Failed to delete bot');
-                    console.error(res);
-                }
-            );
+            this.BotsService.delete(bot._id).then(() => {
+                let pos = this.bots.indexOf(bot);
+                this.bots.splice(pos, 1);
+            }, res => {
+                console.error('Failed to delete bot', res);
+            });
         }
-    };
+    }
 
-    $scope.send = function(bot) {
-        if (!$rootScope.user || !$rootScope.user.token) {
-            return alert('No authenticated user found');
-        }
-
-        var deferred = $q.defer();
-        var channel = bot.channel;
-        var message = bot.message;
-        bot.message = '';
-        if (bot.type === 'user') {
-            // channel is user ID
-            if (!bot.postAsSlackbot) {
-                if ($scope.users[channel].im) {
-                    deferred.resolve($scope.users[channel].im);
+    send(bot) {
+        this.UserService.getUser().then(user => {
+            let deferred = this.$q.defer();
+            let channel = bot.channel;
+            let message = bot.message;
+            bot.message = '';
+            if (bot.type === 'user') {
+                // channel is user ID
+                if (!bot.postAsSlackbot) {
+                    if (this.users[channel].im) {
+                        deferred.resolve(this.users[channel].im);
+                    } else {
+                        this.SlackService.openIM(channel).then(deferred.resolve);
+                    }
                 } else {
-                    SlackFactory.openIM(channel).then(deferred.resolve);
+                    deferred.resolve(channel);
                 }
             } else {
                 deferred.resolve(channel);
             }
-        } else {
-            deferred.resolve(channel);
-        }
 
-        deferred.promise.then(function(channel) {
-            var data = {
-                channel: channel,
-                text: message,
-                username: bot.botname,
-                icon_url: bot.imageUrl,
-                as_user: bot.isUser
-            };
+            deferred.promise.then(channel => {
+                var data = {
+                    channel: channel,
+                    text: message,
+                    username: bot.botname,
+                    icon_url: bot.imageUrl,
+                    as_user: bot.isUser
+                };
 
-            if (bot.attachments) {
-                data.attachments = JSON.stringify([{
-                    fallback: bot.attachments.fallback,
-                    image_url: bot.attachments.imageUrl
-                }]);
-            }
-
-            SlackFactory.postMessage(data).then(
-                function(res) {
-                    console.log(res);
-                },
-                function(res) {
-                    console.error(res);
+                if (bot.attachments) {
+                    data.attachments = JSON.stringify([{
+                        fallback: bot.attachments.fallback,
+                        image_url: bot.attachments.imageUrl
+                    }]);
                 }
-            );
+
+                this.SlackService.postMessage(data).then(() => {}, res => {
+                    console.error(res);
+                });
+            });
         });
-    };
-
-    function updateIndices(bot, i) {
-        if (bot.index !== +i) {
-            bot.index = +i;
-            $scope.save(bot);
-        }
     }
-
-});
+}

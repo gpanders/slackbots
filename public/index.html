@@ -1,13 +1,18 @@
 <!doctype html>
-<html ng-app="slackbots">
+<html ng-app="slackbots" ng-strict-di ng-cloak>
   <head>
     <meta charset="utf-8">
     <title>Slackbots</title>
     <base href="/">
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
+    <style>
+      [ng-cloak], .ng-cloak {
+        display: none !important;
+      }
+    </style>
   </head>
-  <body ng-controller="HomeCtrl">
+  <body ng-controller="HomeCtrl as vm">
     <!--[if lte IE 8]>
       <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -22,28 +27,28 @@
         </div>
       </div>
 
-      <div class="_hidden" ng-show="loaded">
+      <div class="" ng-show="vm.loaded">
         <div class="row text-center form-group form-inline">
             <div class="col-md-3"></div>
-            <div class="col-md-6" ng-hide="user">
+            <div class="col-md-6" ng-hide="vm.user">
                 <label>Token
                     <input
                         class="form-control"
                         name="token" id="token-input"
                         size="45"
                         placeholder="Enter your Slack token here..."
-                        ng-model="token"
+                        ng-model="vm.token"
                     />
                 </label>
-                <button class="btn btn-sm btn-primary" ng-click="checkToken(token)">Submit</button>
+                <button class="btn btn-sm btn-primary" ng-click="vm.checkToken(token)">Submit</button>
             </div>
-            <div class="col-md-6" ng-show="user">
-                <h4>Logged in as @{{user.username}}</h4>
-                <button class="btn btn-sm btn-default" ng-click="signOut()">Sign Out</button>
+            <div class="col-md-6" ng-show="vm.user">
+                <h4>Logged in as @{{vm.user.username}}</h4>
+                <button class="btn btn-sm btn-default" ng-click="vm.signOut()">Sign Out</button>
             </div>
         </div>
         <div class="row">
-            <div class="col-12 text-center" ng-class="{ 'has-success': user, 'has-error': !user }" ng-show="authMessage"><label class="control-label" ng-bind="authMessage"></label></div>
+            <div class="col-12 text-center" ng-class="{ 'has-success': vm.user, 'has-error': !vm.user }" ng-show="vm.authMessage"><label class="control-label" ng-bind="vm.authMessage"></label></div>
         </div>
       </div>
 
@@ -71,21 +76,15 @@
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="modalSubmit()">Remove Image</button>
+                    <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="vm.modalSubmit()">Remove Image</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    <button type="submit" class="btn btn-primary" data-dismiss="modal" ng-click="modalSubmit(imageUrlValue)">Save</button>
+                    <button type="submit" class="btn btn-primary" data-dismiss="modal" ng-click="vm.modalSubmit(imageUrlValue)">Save</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <script type="text/javascript" src="/assets/vendor.bundle.js"></script>
     <script type="text/javascript" src="/assets/app.js"></script>
-    <script type="text/javascript">
-      (function($) {
-        $(document).ready(function() {
-          $('._hidden').removeClass('_hidden');
-        });
-      })(jQuery);
-    </script>
 </body>
 </html>

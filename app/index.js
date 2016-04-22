@@ -1,10 +1,12 @@
 global.jQuery = global.$ = require('jquery');
-require('jquery-ui/sortable');
 
-require('angular');
-require('angular-storage');
-require('angular-ui-sortable');
-require('angular-ui-router');
+import Slack from './slack/slack.component';
+import Token from './token/token.component';
+import Home from './home/home.component';
+import User from './user/user.component';
+import Bots from './bots/bots.component';
+
+import BotsState from './bots/bots.state';
 
 module.exports = angular.module('slackbots', [
     // vendor
@@ -13,10 +15,11 @@ module.exports = angular.module('slackbots', [
     'ui.sortable',
 
     // app
-    require('./slack/slack').name,
-    require('./token/token').name,
-    require('./home/home').name,
-    require('./bots/bots').name
+    Slack.name,
+    Token.name,
+    User.name,
+    Home.name,
+    Bots.name
 ])
 .config(function($stateProvider, $urlRouterProvider, $locationProvider) {
     $urlRouterProvider.otherwise('/');
@@ -27,5 +30,5 @@ module.exports = angular.module('slackbots', [
             url: '/',
             template: ''
         })
-        .state('bots', require('./bots/bots.state'));
+        .state('bots', BotsState);
 });

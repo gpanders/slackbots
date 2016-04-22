@@ -1,7 +1,9 @@
-.bot-title {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
+.bot__title {
+    .bot__row.collapsed & {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
     h3 {
         margin: 0;
         display: inline-block;
@@ -22,14 +24,14 @@
     }
 }
 
-.bot-collapse-expand {
+.bot__collapse-expand {
     position: absolute;
     top: 20px;
     left: 20px;
     z-index: 999;
 }
 
-.bot-row {
+.bot__row {
     display: flex;
     background: #fff;
     flex-flow: row nowrap;
@@ -42,13 +44,13 @@
     &.collapsed {
         height: 62px;
 
-        .bot-img-container {
+        .bot__img-container {
             opacity: 0; // hack to maintain width while hidden
         }
     }
 }
 
-.bot-img-container {
+.bot__img-container {
     display: flex;
     flex-flow: column nowrap;
     align-items: center;
@@ -57,13 +59,13 @@
     height: 255px;
 }
 
-.bot-img {
+.bot__img {
     max-height: 120px;
     max-width: 120px;
     margin-bottom: 25px;
 }
 
-.bot-user-label {
+.bot__user-label {
     font-size: 16px;
     padding: 5px;
     background-color: #dbdbdb;
@@ -71,6 +73,6 @@
     color: #787878;
 }
 
-.bot-body {
+.bot__body {
     flex: 0 0 75%;
 }

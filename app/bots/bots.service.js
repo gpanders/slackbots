@@ -1,106 +1,107 @@
 'use strict';
 
-module.exports = angular.module('slackbots.botsFactory', [])
-.factory('BotFactory', function($rootScope, $http, $q) {
-    var service = {};
+export class BotsService {
+    /*@ngInject*/
+    constructor($http, $q, UserService, SlackService) {
+        this.$http = $http;
+        this.$q = $q;
+        this.UserService = UserService;
+        this.SlackService = SlackService;
 
-    service.getAll = function() {
-        var deferred = $q.defer();
+        this.bots = [];
+    }
 
-        var user = $rootScope.user;
-        if (!user || !user.id) {
-            deferred.reject('No authenticated user found');
-            return deferred.promise;
-        }
-
-        $http({
-            method: 'GET',
-            url: '/bots/list',
-            params: { userId: user.id }
-        }).then(
-            function(res) {
-                deferred.resolve(res.data);
-            },
-            function(res) {
-                console.error('Failed to get bot list');
-                deferred.reject(res);
+    updateIndices() {
+        this.bots.forEach((bot, i) => {
+            if (bot.index !== +i) {
+                bot.index = +i;
+                this.save(bot);
             }
-        );
+        });
+    }
+
+    getAll() {
+        let deferred = this.$q.defer();
+
+        this.UserService.getUser().then(user => {
+            if (this.bots.length) {
+                deferred.resolve(this.bots);
+            } else {
+                this.$http({
+                    method: 'GET',
+                    url: '/bots/list',
+                    params: { userId: user.id }
+                }).then(
+                    res => {
+                        this.bots = res.data;
+                        this.SlackService.getUserInfo(user.id).then(userBot => {
+                            this.bots.unshift({
+                                isUser: true,
+                                botname: userBot.realName,
+                                imageUrl: userBot.imageUrl
+                            });
+                            deferred.resolve(this.bots);
+                        });
+                    },
+                    res => {
+                        console.error('Failed to get bot list');
+                        deferred.reject(res);
+                    }
+                );
+            }
+        }, () => deferred.reject('No authenticated user found'));
 
         return deferred.promise;
+    }
 
+    create(bot) {
+        let deferred = this.$q.defer();
+        this.UserService.getUser().then(user => {
+            bot.userId = user.id;
 
-    };
+            this.$http({
+                method: 'POST',
+                url: '/bots/create',
+                data: bot
+            }).then(
+                res => {
+                    this.bots.unshift(bot);
+                    this.updateIndices();
+                    deferred.resolve(res.data);
+                },
+                res => deferred.reject(res)
+            );
+        }, () => deferred.reject('No authenticatd user found'));
 
-    service.create = function(bot) {
-        var deferred = $q.defer();
-        var user = $rootScope.user;
-        if (!user || !user.id) {
-            deferred.reject('No authenticated user found');
-            return deferred.promise;
-        }
-
-        bot.userId = user.id;
-
-        $http({
-            method: 'POST',
-            url: '/bots/create',
-            data: bot
-        }).then(
-            function(res) {
-                deferred.resolve(res.data);
-            },
-            function(res) {
-                deferred.reject(res);
-            }
-        );
         return deferred.promise;
-    };
+    }
 
-    service.update = function(bot) {
-        var deferred = $q.defer();
-        var user = $rootScope.user;
-        if (!user || !user.id) {
-            deferred.reject('No authenticated user found');
-            return deferred.promise;
-        }
+    update(bot) {
+        let deferred = this.$q.defer();
+        this.UserService.getUser().then(user => {
+            bot.userId = user.id;
 
-        bot.userId = user.id;
-
-        $http({
-            method: 'PUT',
-            url: '/bots/update',
-            params: { id: bot._id },
-            data: bot
-        }).then(
-            function(res) {
-                deferred.resolve(res.data);
-            },
-            function(res) {
-                deferred.reject(res);
-            }
-        );
+            this.$http({
+                method: 'PUT',
+                url: '/bots/update',
+                params: { id: bot._id },
+                data: bot
+            }).then(
+                res => deferred.resolve(res.data),
+                res => deferred.reject(res)
+            );
+        }, () => deferred.reject('No autheticated user found'));
         return deferred.promise;
-    };
+    }
 
-    service.delete = function(id) {
-        var deferred = $q.defer();
-        var user = $rootScope.user;
-        if (!user || !user.id) {
-            deferred.reject('No authenticated user found');
-            return deferred.promise;
-        }
-
-        $http.delete('/bots/delete?id=' + id).then(
-            function(res) {
-                deferred.resolve(res.data);
-            },
-            function(res) {
-                deferred.reject(res);
-            }
-        );
+    delete(id) {
+        let deferred = this.$q.defer();
+        this.UserService.getUser().then(() => {
+            this.$http.delete('/bots/delete?id=' + id).then(
+                res => deferred.resolve(res.data),
+                res => deferred.reject(res)
+            );
+        }, () => deferred.reject('No authenticated user found'));
         return deferred.promise;
-    };
-
-    return service;
-});
+    }
+}

@@ -1,23 +1,23 @@
 <div class="row">
     <div class="col-12 text-center">
-        <button type="button" class="btn btn-default" ng-click="newBot()">Add Bot</button>
+        <button type="button" class="btn btn-default" ng-click="vm.newBot()">Add Bot</button>
     </div>
 </div>
 <div class="spacer"></div>
-<div id="bot-list" ui-sortable="sortOpts" ng-model="bots">
-    <div ng-repeat="bot in bots" class="bot-row moveable" ng-class="{ 'collapsed': !bot.expanded }" data-bot-id="{{bot._id}}">
-        <div class="bot-collapse-expand clickable" ng-click="bot.expanded = !bot.expanded">
+<div id="bot-list" ui-sortable="vm.sortOpts" ng-model="vm.bots">
+    <div ng-repeat="bot in vm.bots" class="bot__row moveable" ng-class="{ 'collapsed': !bot.expanded }" data-bot-id="{{bot._id}}">
+        <div class="bot__collapse-expand clickable" ng-click="bot.expanded = !bot.expanded">
             <i class="glyphicon glyphicon-minus" ng-show="bot.expanded"></i>
             <i class="glyphicon glyphicon-plus" ng-hide="bot.expanded"></i>
         </div>
-        <div class="bot-img-container">
-            <img class="bot-img" ng-src="{{bot.imageUrl}}" ng-show="bot.imageUrl" />
-            <button class="btn btn-sm btn-default" ng-hide="bot.isUser" data-toggle="modal" data-target="#edit-image-modal" ng-click="editBotImage(bot)">{{bot.imageUrl ? 'Edit' : 'Add'}} Image</button>
+        <div class="bot__img-container">
+            <img class="bot__img" ng-src="{{bot.imageUrl}}" ng-show="bot.imageUrl" />
+            <button class="btn btn-sm btn-default" ng-hide="bot.isUser" data-toggle="modal" data-target="#edit-image-modal" ng-click="vm.editBotImage(bot)">{{bot.imageUrl ? 'Edit' : 'Add'}} Image</button>
         </div>
-        <div class="bot-body">
+        <div class="bot__body">
             <div class="row">
                 <div class="col-md-9">
-                    <form class="bot-title form-group" ng-submit="(editBotname = false) || save(bot)">
+                    <form class="bot__title form-group" ng-submit="(editBotname = false) || vm.save(bot)">
                         <div ng-hide="editBotname">
                             <h3 ng-class="{ clickable: !bot.isUser }" ng-click="editBotname = !bot.isUser">{{bot.botname}}</h3>
                         </div>
@@ -43,17 +43,17 @@
                         ng-class="{ 'btn-default': !deleteHover, 'btn-danger': deleteHover }"
                         ng-mouseenter="deleteHover = true"
                         ng-mouseleave="deleteHover = false"
-                        ng-click="delete(bot)">
+                        ng-click="vm.delete(bot)">
                             <i class="glyphicon glyphicon-remove"></i>
                     </button>
-                    <label ng-show="bot.isUser" class="bot-user-label">YOU</label>
+                    <label ng-show="bot.isUser" class="bot__user-label">YOU</label>
                 </div>
             </div>
-            <form ng-submit="send(bot)" ng-show="bot.expanded">
+            <form ng-submit="vm.send(bot)" ng-show="bot.expanded">
                 <div class="row form-group">
                     <div class="col-md-3">
                         <label>Post to</label>
-                        <select class="form-control" name="type" id="type-select" ng-change="save(bot)" ng-model="bot.type" ng-model-options="{ debounce: 500 }">
+                        <select class="form-control" name="type" id="type-select" ng-change="vm.save(bot)" ng-model="bot.type" ng-model-options="{ debounce: 500 }">
                             <option ng-repeat="type in ['User', 'Channel', 'Group']" value="{{type | lowercase}}">{{type}}</option>
                         </select>
                     </div>
@@ -64,9 +64,9 @@
                             name="user" id="user-select"
                             class="form-control"
                             ng-model="bot.channel"
-                            ng-change="save(bot)"
+                            ng-change="vm.save(bot)"
                             ng-model-options="{ debounce: 500 }"
-                            ng-options="id as user.name for (id, user) in users">
+                            ng-options="id as user.name for (id, user) in vm.users">
                         </select>
                     </div>
 
@@ -77,7 +77,7 @@
                                 type="radio"
                                 name="userChannel"
                                 ng-checked="bot.postAsSlackbot"
-                                ng-click="(bot.postAsSlackbot = true) || save(bot)"
+                                ng-click="(bot.postAsSlackbot = true) || vm.save(bot)"
                             />slackbot
                         </label>
                         <label class="radio-inline">
@@ -85,7 +85,7 @@
                                 type="radio"
                                 name="userChannel"
                                 ng-checked="!bot.postAsSlackbot"
-                                ng-click="(bot.postAsSlackbot = false) || save(bot)"
+                                ng-click="(bot.postAsSlackbot = false) || vm.save(bot)"
                             />IM
                         </label>
                     </div>
@@ -96,9 +96,9 @@
                             name="channel" id="channel-select"
                             class="form-control"
                             ng-model="bot.channel"
-                            ng-change="save(bot)"
+                            ng-change="vm.save(bot)"
                             ng-model-options="{ debounce: 500 }"
-                            ng-options="id as channel for (id, channel) in channels">
+                            ng-options="id as channel for (id, channel) in vm.channels">
                         </select>
                     </div>
 
@@ -108,9 +108,9 @@
                             name="group" id="group-select"
                             class="form-control"
                             ng-model="bot.channel"
-                            ng-change="save(bot)"
+                            ng-change="vm.save(bot)"
                             ng-model-options="{ debounce: 500 }"
-                            ng-options="id as group for (id, group) in groups">
+                            ng-options="id as group for (id, group) in vm.groups">
                         </select>
                     </div>
                 </div>
@@ -136,12 +136,12 @@
                     <div class="row form-group">
                         <div class="col-md-12">
                             <label>Image</label>
-                            <div class="bot-attachment-img-container">
-                                <img class="bot-img" ng-show="bot.attachments.imageUrl" ng-src="{{bot.attachments.imageUrl}}" />
+                            <div class="bot__attachment-img-container">
+                                <img class="bot__img" ng-show="bot.attachments.imageUrl" ng-src="{{bot.attachments.imageUrl}}" />
                             </div>
                         </div>
                         <div class="col-md-12">
-                            <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#edit-image-modal" ng-click="editAttachmentImage(bot)">{{bot.attachments.imageUrl ? 'Edit' : 'Add'}} Image</button>
+                            <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#edit-image-modal" ng-click="vm.editAttachmentImage(bot)">{{bot.attachments.imageUrl ? 'Edit' : 'Add'}} Image</button>
                         </div>
                     </div>
                     <div class="row form-group">

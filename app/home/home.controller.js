@@ -1,66 +1,71 @@
 'use strict';
 
-module.exports = angular.module('slackbots.homeCtrl', [])
-.controller('HomeCtrl', function($rootScope, $scope, $state, SlackFactory, TokenService) {
-    $scope.loaded = false;
-    $scope.bots = [];
 
-    $scope.checkToken = function(token) {
-        SlackFactory.authorize(token).then(
-            function(user) {
-                $rootScope.user = user;
-                TokenService.save(token);
-                $scope.authMessage = 'Authorized! Loading bots...';
-                $scope.loaded = true;
+export class HomeCtrl {
+    /*@ngInject*/
+    constructor($rootScope, $state, SlackService, TokenService, UserService, BotsService) {
+        this.$rootScope = $rootScope;
+        this.$state = $state;
+        this.SlackService = SlackService;
+        this.TokenService = TokenService;
+        this.UserService = UserService;
+        this.BotsService = BotsService;
 
-                $state.go('bots').then(function() {
-                    $scope.authMessage = '';
-                });
+        this.loaded = false;
+        this.modal = {};
 
-
-            },
-            function(err) {
-                TokenService.clear();
-                delete $rootScope.user;
-                $scope.authMessage = 'Authorization failed: ' + err;
-                $scope.loaded = true;
-            }
-        );
-    };
-
-    $scope.signOut = function() {
-        TokenService.clear();
-        $scope.bots = [];
-        delete $rootScope.user;
-        $state.go('default');
-    };
-
-    var modal = {};
-
-    $scope.editBotImage = function(bot) {
-        openModal(bot);
-    };
-
-    $scope.editAttachmentImage = function(bot) {
-        openModal(bot.attachments);
-    };
-
-    $scope.modalSubmit = function(url) {
-        modal.field.imageUrl = url;
-        if (modal.field.hasOwnProperty('unsaved')) {
-            modal.field.unsaved = true;
+        var token = this.TokenService.get();
+        if (token) {
+            this.checkToken(token);
+        } else {
+            this.loaded = true;
         }
-    };
-
-    var token = TokenService.get();
-    if (token) {
-        $scope.checkToken(token);
-    } else {
-        $scope.loaded = true;
     }
 
-    function openModal(field) {
-        modal.field = field;
-        $scope.imageUrlValue = field.imageUrl;
+    checkToken(token) {
+        this.SlackService.authorize(token).then(user => {
+            this.user = user;
+            this.UserService.setUser(user);
+            this.TokenService.save(token);
+            this.authMessage = 'Authorized! Loading bots...';
+            this.loaded = true;
+
+            this.$state.go('bots').then(() => {
+                this.authMessage = '';
+            });
+        }, err => {
+            delete this.user;
+            this.TokenService.clear();
+            this.UserService.removeUser();
+            this.authMessage = 'Authorization failed: ' + err;
+            this.loaded = true;
+        });
     }
-});
+
+    signOut() {
+        this.TokenService.clear();
+        this.BotsService.bots = [];
+        this.UserService.removeUser();
+        this.$state.go('default');
+    }
+
+    openModal(field) {
+        this.modal.field = field;
+        this.imageUrlValue = field.imageUrl;
+    }
+
+    editBotImage(bot) {
+        this.openModal(bot);
+    }
+
+    editAttachmentImage(bot) {
+        this.openModal(bot.attachments);
+    }
+
+    modalSubmit(url) {
+        this.modal.field.imageUrl = url;
+        if (this.modal.field.hasOwnProperty('unsaved')) {
+            this.modal.field.unsaved = true;
+        }
+    }
+}
