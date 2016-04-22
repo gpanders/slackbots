@@ -37,14 +37,14 @@
                         name="token" id="token-input"
                         size="45"
                         placeholder="Enter your Slack token here..."
-                        ng-model="vm.token"
+                        ng-model="token"
                     />
                 </label>
                 <button class="btn btn-sm btn-primary" ng-click="vm.checkToken(token)">Submit</button>
             </div>
             <div class="col-md-6" ng-show="vm.user">
                 <h4>Logged in as @{{vm.user.username}}</h4>
-                <button class="btn btn-sm btn-default" ng-click="vm.signOut()">Sign Out</button>
+                <button class="btn btn-sm btn-default" ng-click="token = '' || vm.signOut()">Sign Out</button>
             </div>
         </div>
         <div class="row">

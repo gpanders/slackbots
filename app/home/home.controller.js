@@ -14,7 +14,7 @@ export class HomeCtrl {
         this.loaded = false;
         this.modal = {};
 
-        var token = this.TokenService.get();
+        let token = this.TokenService.get();
         if (token) {
             this.checkToken(token);
         } else {
@@ -43,6 +43,7 @@ export class HomeCtrl {
     }
 
     signOut() {
+        delete this.user;
         this.TokenService.clear();
         this.BotsService.bots = [];
         this.UserService.removeUser();
