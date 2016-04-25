@@ -2,10 +2,10 @@
   "name": "slackbots",
   "private": true,
   "engines": {
-    "node": "5.3.0"
+    "node": "5.11.0"
   },
   "scripts": {
-    "start": "node index.js",
+    "start": "node --harmony dist/index.js",
     "postinstall": "webpack"
   },
   "dependencies": {

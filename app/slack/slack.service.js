@@ -1,5 +1,3 @@
-'use strict';
-
 export class SlackService {
     /*@ngInject*/
     constructor($rootScope, $q, $http, UserService) {
@@ -7,6 +5,10 @@ export class SlackService {
         this.$q = $q;
         this.$http = $http;
         this.UserService = UserService;
+    }
+
+    get name() {
+        return 'SlackService';
     }
 
     authorize(token) {

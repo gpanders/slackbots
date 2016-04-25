@@ -1,6 +1,3 @@
-'use strict';
-
-
 export class HomeCtrl {
     /*@ngInject*/
     constructor($rootScope, $state, SlackService, TokenService, UserService, BotsService) {
@@ -20,6 +17,10 @@ export class HomeCtrl {
         } else {
             this.loaded = true;
         }
+    }
+
+    get name() {
+        return 'HomeCtrl';
     }
 
     checkToken(token) {

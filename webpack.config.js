@@ -15,7 +15,7 @@ module.exports = (function() {
     };
 
     config.output = {
-        path: path.join(__dirname, 'public', 'assets'),
+        path: path.join(__dirname, 'dist/public', 'assets'),
         filename: '[name].js',
         publicPath: '/assets/'
     };

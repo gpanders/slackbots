@@ -1,5 +1,3 @@
-'use strict';
-
 export class BotsService {
     /*@ngInject*/
     constructor($http, $q, UserService, SlackService) {
@@ -9,6 +7,10 @@ export class BotsService {
         this.SlackService = SlackService;
 
         this.bots = [];
+    }
+
+    get name() {
+        return 'BotsService';
     }
 
     updateIndices() {

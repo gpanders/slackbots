@@ -1,5 +1,3 @@
-global.jQuery = global.$ = require('jquery');
-
 import Slack from './slack/slack.component';
 import Token from './token/token.component';
 import Home from './home/home.component';

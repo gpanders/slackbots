@@ -1,10 +1,12 @@
-'use strict';
-
 export class UserService {
     /*@ngInject*/
     constructor($q) {
         this.$q = $q;
         this.user = null;
+    }
+
+    get name() {
+        return 'User Service';
     }
 
     getUser() {

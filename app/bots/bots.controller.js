@@ -1,5 +1,3 @@
-'use strict';
-
 export class BotsCtrl {
     /*@ngInject*/
     constructor($q, BotsService, UserService, SlackService) {
@@ -16,6 +14,10 @@ export class BotsCtrl {
         this.sortOpts = {
             stop: () => this.BotsService.updateIndices()
         };
+    }
+
+    get name() {
+        return 'BotsCtrl';
     }
 
     newBot() {

@@ -1,8 +1,8 @@
 'use strict';
 
-var mongoose = require('mongoose');
+let mongoose = require('mongoose');
 
-var BotSchema = new mongoose.Schema({
+let BotSchema = new mongoose.Schema({
     botname: {
         type: String,
         required: true
