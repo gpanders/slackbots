@@ -1,21 +1,20 @@
 export class HomeCtrl {
     /*@ngInject*/
-    constructor($rootScope, $state, SlackService, TokenService, UserService, BotsService) {
-        this.$rootScope = $rootScope;
+    constructor($state, SlackService, TokenService, UserService, BotsService) {
         this.$state = $state;
-        this.SlackService = SlackService;
-        this.TokenService = TokenService;
-        this.UserService = UserService;
-        this.BotsService = BotsService;
+        this.slackService = SlackService;
+        this.tokenService = TokenService;
+        this.userService = UserService;
+        this.botsService = BotsService;
 
-        this.loaded = false;
         this.modal = {};
 
-        let token = this.TokenService.get();
+        let token = this.tokenService.get();
+
+        this.loaded = !token;
+
         if (token) {
             this.checkToken(token);
-        } else {
-            this.loaded = true;
         }
     }
 
@@ -23,31 +22,35 @@ export class HomeCtrl {
         return 'HomeCtrl';
     }
 
-    checkToken(token) {
-        this.SlackService.authorize(token).then(user => {
-            this.user = user;
-            this.UserService.setUser(user);
-            this.TokenService.save(token);
-            this.authMessage = 'Authorized! Loading bots...';
-            this.loaded = true;
+    get authenticated() {
+        return this.userService.isAuthenticated();
+    }
 
-            this.$state.go('bots').then(() => {
-                this.authMessage = '';
+    checkToken(token) {
+        this.slackService.authorize(token)
+            .then(user => {
+                this.userService.setUser(user)
+                    .then(user => this.user = user);
+                this.tokenService.save(token);
+                this.authMessage = 'Authorized! Loading bots...';
+                this.loaded = true;
+
+                this.$state.go('bots').then(() => {
+                    this.authMessage = '';
+                });
+            })
+            .catch(err => {
+                this.tokenService.clear();
+                this.userService.removeUser();
+                this.authMessage = `Authorization failed: ${err}`;
+                this.loaded = true;
             });
-        }, err => {
-            delete this.user;
-            this.TokenService.clear();
-            this.UserService.removeUser();
-            this.authMessage = 'Authorization failed: ' + err;
-            this.loaded = true;
-        });
     }
 
     signOut() {
-        delete this.user;
-        this.TokenService.clear();
-        this.BotsService.bots = [];
-        this.UserService.removeUser();
+        this.botsService.bots = [];
+        this.tokenService.clear();
+        this.userService.removeUser();
         this.$state.go('default');
     }
 

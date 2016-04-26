@@ -1,27 +1,25 @@
 export class UserService {
-    /*@ngInject*/
-    constructor($q) {
-        this.$q = $q;
-        this.user = null;
-    }
+    constructor() {}
 
     get name() {
         return 'User Service';
     }
 
     getUser() {
-        let deferred = this.$q.defer();
-        if (this.user && this.user.id) {
-            deferred.resolve(this.user);
+        if (this.isAuthenticated()) {
+            return Promise.resolve(this.user);
         } else {
-            deferred.reject();
+            return Promise.reject();
         }
-
-        return deferred.promise;
     }
 
     setUser(user) {
         this.user = user;
+        return Promise.resolve(this.user);
+    }
+
+    isAuthenticated() {
+        return Boolean(this.user && this.user.id);
     }
 
     removeUser() {
