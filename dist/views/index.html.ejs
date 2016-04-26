@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html ng-app="slackbots" ng-strict-di ng-cloak>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+    <title>slackbots</title>
+    <base href="/">
+    <style>
+      [ng-cloak], .ng-cloak {
+        display: none !important;
+      }
+    </style>
+  </head>
+  <body ng-controller="HomeCtrl as vm">
+    <div class="header">
+      <div class="navbar navbar-default" role="navigation">
+        <div class="container">
+          <div class="navbar-header">
+            <a class="navbar-brand" href="/">slackbots</a>
+          </div>
+        </div>
+      </div>
+
+      <div ng-show="vm.loaded">
+        <div class="row text-center form-group form-inline">
+          <div class="col-md-offset-3 col-md-6" ng-hide="vm.authenticated">
+            <label>Token
+              <input
+                class="form-control"
+                name="token" id="token-input"
+                size="45"
+                placeholder="Enter your Slack token here..."
+                ng-model="token"
+              />
+            </label>
+            <button
+              class="btn btn-sm btn-primary"
+              ng-click="vm.checkToken(token)">Submit
+            </button>
+          </div>
+          <div class="col-md-offset-3 col-md-6" ng-show="vm.authenticated">
+            <h4>Logged in as @{{vm.user.username}}</h4>
+            <button
+              class="btn btn-sm btn-default"
+              ng-click="token = '' || vm.signOut()">Sign Out
+            </button>
+          </div>
+        </div>
+        <div class="row">
+          <div
+            class="col-12 text-center"
+            ng-class="{ 'has-success': vm.user, 'has-error': !vm.user }"
+            ng-show="vm.authMessage">
+            <label class="control-label">{{vm.authMessage}}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div ui-view></div>
+    </div>
+
+    <div id="edit-image-modal" class="modal fade">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+            <h4 class="modal-title">Edit Image URL</h4>
+          </div>
+          <div class="modal-body">
+            <div class="form-group">
+              <input
+                type="text"
+                name="imageUrl" id="image-url-input"
+                class="form-control"
+                placeholder="Image URL..."
+                ng-model="imageUrlValue "
+              />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="vm.modalSubmit()">Remove Image</button>
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="submit" class="btn btn-primary" data-dismiss="modal" ng-click="vm.modalSubmit(imageUrlValue)">Save</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript" src="<%= vendor.js %>"></script>
+    <script type="text/javascript" src="<%= app.js %>"></script>
+  </body>
+</html>

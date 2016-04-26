@@ -1,63 +1,94 @@
-var webpack = require('webpack');
-var autoprefixer = require('autoprefixer');
-var path = require('path');
+'use strict';
 
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
+const webpack = require('webpack');
+const autoprefixer = require('autoprefixer');
+const path = require('path');
 
-var isProd = process.env.NODE_ENV === 'production';
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const CleanPlugin = require('clean-webpack-plugin');
+const AssetsPlugin = require('assets-webpack-plugin');
 
-module.exports = (function() {
-    var config = {};
+const isProd = process.env.NODE_ENV === 'production';
+const isDev = process.env.NODE_ENV === 'development';
 
-    config.entry = {
-        vendor: './app/vendor.js',
-        app: './app/index.js'
-    };
+const PUBLIC_PATH = 'js';
+const DIST_PATH = path.join(__dirname, 'dist');
+const BUILD_PATH = path.join(DIST_PATH, 'public');
+const ASSETS_PATH = path.join(BUILD_PATH, PUBLIC_PATH);
 
-    config.output = {
-        path: path.join(__dirname, 'dist/public', 'assets'),
-        filename: '[name].js',
-        publicPath: '/assets/'
-    };
+let config = {};
 
-    config.resolve = {
-        extensions: ['', '.js', '.scss']
-    };
+config.entry = {
+    vendor: './app/vendor',
+    app: './app/app'
+};
 
-    config.module = {
-        loaders: [
-            {
-                test: /\.js$/,
-                loader: 'ng-annotate!babel?presets[]=es2015!jshint',
-                exclude: /node_modules|bower_components/
-            }, {
-                test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-                loader: "url?limit=10000"
-            }, {
-                test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
-                loader: 'file'
-            },
-            { test: /\.html$/, loader: 'html' },
-            {
-                test: /\.css$/,
-                loader: 'style!css!postcss'
-            }, {
-                test: /\.scss$/,
-                loader: 'style!css!postcss!sass'
-            },
-            { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports?jQuery=jquery' },
-        ]
-    };
+config.output = {
+    path: ASSETS_PATH,
+    filename: '[name]' + (isDev ? '' : '.[hash]') + '.js',
+    publicPath: `/${PUBLIC_PATH}/`
+};
 
-    config.postcss = [ autoprefixer ];
+config.resolve = {
+    extensions: ['', '.js', '.scss']
+};
 
-    config.plugins = [
-        new webpack.optimize.CommonsChunkPlugin(/* chunkName= */'vendor', /* filename= */'vendor.bundle.js'),
-    ];
+config.module = {
+    loaders: [
+        {
+            test: /\.js$/,
+            loader: 'ng-annotate!babel?presets[]=es2015!jshint',
+            exclude: /node_modules|bower_components/
+        }, {
+            test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
+            loader: "url?limit=10000"
+        }, {
+            test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
+            loader: 'file'
+        },
+        { test: /\.html$/, loader: 'html' },
+        {
+            test: /\.css$/,
+            loader: 'style!css!postcss'
+        }, {
+            test: /\.scss$/,
+            loader: 'style!css!postcss!sass'
+        },
+        { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports?jQuery=jquery' },
+    ]
+};
 
-    if (isProd) {
-        config.plugins.push(new webpack.optimize.UglifyJsPlugin());
-    }
+config.postcss = [ autoprefixer ];
 
-    return config;
-})();
+config.plugins = [
+    new webpack.optimize.CommonsChunkPlugin(
+        /* chunkName= */'vendor',
+        /* filename= */'vendor' + (isDev ? '' : '.[hash]') + '.js'),
+
+    new CleanPlugin(BUILD_PATH),
+
+    new AssetsPlugin({
+        filename: 'webpack.assets.json',
+        path: DIST_PATH,
+        prettyPrint: true
+    })
+];
+
+if (isProd) {
+    config.plugins.push(new webpack.optimize.UglifyJsPlugin({
+        compress: {
+            warnings: false
+        },
+        output: {
+            comments: false
+        }
+    }));
+}
+
+if (isDev) {
+    config.cache = true;
+    config.devtool = 'eval';
+    config.watch = true;
+}
+
+module.exports = config;

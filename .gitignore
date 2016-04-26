@@ -3,6 +3,7 @@ node_modules/
 .editorconfig
 .gitattributes
 .env
+webpack.assets.json
 *.log
 
-dist/public/assets/
+dist/public/
