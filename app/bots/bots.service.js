@@ -1,7 +1,8 @@
 export class BotsService {
     /*@ngInject*/
-    constructor($http, UserService, SlackService) {
+    constructor($http, $q, UserService, SlackService) {
         this.$http = $http;
+        this.$q = $q;
         this.userService = UserService;
         this.slackService = SlackService;
 
@@ -27,7 +28,7 @@ export class BotsService {
     }
 
     getAll() {
-        return new Promise((resolve, reject) => {
+        return this.$q((resolve, reject) => {
             this.userService.getUser()
                 .then(user => {
                     if (this.bots.length) {
@@ -56,7 +57,7 @@ export class BotsService {
     }
 
     create(bot) {
-        return new Promise((resolve, reject) => {
+        return this.$q((resolve, reject) => {
             this.userService.getUser()
                 .then(user => {
                     bot.userId = user.id;
@@ -76,7 +77,7 @@ export class BotsService {
     }
 
     update(bot) {
-        return new Promise((resolve, reject) => {
+        return this.$q((resolve, reject) => {
             this.userService.getUser()
                 .then(user => {
                     bot.userId = user.id;
@@ -86,15 +87,16 @@ export class BotsService {
                         url: '/bots/update',
                         params: { id: bot._id },
                         data: bot
-                    }).then(res => resolve(res.data))
-                      .catch(reject);
+                    })
+                    .then(res => resolve(res.data))
+                    .catch(reject);
                 })
                 .catch(this._error(reject));
         });
     }
 
     delete(id) {
-        return new Promise((resolve, reject) => {
+        return this.$q((resolve, reject) => {
             this.userService.getUser()
                 .then(() => {
                     this.$http.delete('/bots/delete?id=' + id)

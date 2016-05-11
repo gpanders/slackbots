@@ -1,8 +1,8 @@
-import Slack from './slack/slack.component';
-import Token from './token/token.component';
-import Home from './home/home.component';
-import User from './user/user.component';
-import Bots from './bots/bots.component';
+import Slack from './slack/slack.module';
+import Token from './token/token.module';
+import Home from './home/home.module';
+import User from './user/user.module';
+import Bots from './bots/bots.module';
 
 import FocusOn from './core/focusOn';
 

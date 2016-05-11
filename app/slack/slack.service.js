@@ -1,7 +1,8 @@
 export class SlackService {
     /*@ngInject*/
-    constructor($http, UserService) {
+    constructor($http, $q, UserService) {
         this.$http = $http;
+        this.$q = $q;
         this.userService = UserService;
     }
 
@@ -10,7 +11,7 @@ export class SlackService {
     }
 
     authorize(token) {
-        return new Promise((resolve, reject) => {
+        return this.$q((resolve, reject) => {
             this.$http({
                 method: 'GET',
                 url: 'https://slack.com/api/auth.test',
@@ -33,7 +34,7 @@ export class SlackService {
     }
 
     getUserInfo(userId) {
-        return new Promise((resolve, reject) => {
+        return this.$q((resolve, reject) => {
             this.userService.getUser()
                 .then(user => {
                     this.$http({
@@ -64,7 +65,7 @@ export class SlackService {
     }
 
     postMessage(data) {
-        return new Promise((resolve, reject) => {
+        return this.$q((resolve, reject) => {
             this.userService.getUser()
                 .then(user => {
                     data.token = user.token;
@@ -91,7 +92,7 @@ export class SlackService {
     }
 
     openIM(userId) {
-        return new Promise((resolve, reject) => {
+        return this.$q((resolve, reject) => {
             this.userService.getUser()
                 .then(user => {
                     this.$http({
@@ -117,7 +118,7 @@ export class SlackService {
     }
 
     getData(type) {
-        return new Promise((resolve, reject) => {
+        return this.$q((resolve, reject) => {
             this.userService.getUser()
                 .then(user => {
                     let token = user.token;

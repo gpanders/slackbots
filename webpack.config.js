@@ -9,7 +9,6 @@ const CleanPlugin = require('clean-webpack-plugin');
 const AssetsPlugin = require('assets-webpack-plugin');
 
 const isProd = process.env.NODE_ENV === 'production';
-const isDev = process.env.NODE_ENV === 'development';
 
 const PUBLIC_PATH = 'js';
 const DIST_PATH = path.join(__dirname, 'dist');
@@ -25,7 +24,7 @@ config.entry = {
 
 config.output = {
     path: ASSETS_PATH,
-    filename: '[name]' + (isDev ? '' : '.[hash]') + '.js',
+    filename: '[name]' + (isProd ? '.[hash]' : '') + '.js',
     publicPath: `/${PUBLIC_PATH}/`
 };
 
@@ -63,7 +62,7 @@ config.postcss = [ autoprefixer ];
 config.plugins = [
     new webpack.optimize.CommonsChunkPlugin(
         /* chunkName= */'vendor',
-        /* filename= */'vendor' + (isDev ? '' : '.[hash]') + '.js'),
+        /* filename= */'vendor' + (isProd ? '.[hash]' : '') + '.js'),
 
     new CleanPlugin(BUILD_PATH),
 
@@ -85,7 +84,7 @@ if (isProd) {
     }));
 }
 
-if (isDev) {
+if (!isProd) {
     config.cache = true;
     config.devtool = 'eval';
     config.watch = true;

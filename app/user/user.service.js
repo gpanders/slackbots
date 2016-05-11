@@ -1,5 +1,8 @@
 export class UserService {
-    constructor() {}
+    /*@ngInject*/
+    constructor($q) {
+        this.$q = $q;
+    }
 
     get name() {
         return 'User Service';
@@ -7,15 +10,15 @@ export class UserService {
 
     getUser() {
         if (this.isAuthenticated()) {
-            return Promise.resolve(this.user);
+            return this.$q.resolve(this.user);
         } else {
-            return Promise.reject();
+            return this.$q.reject();
         }
     }
 
     setUser(user) {
         this.user = user;
-        return Promise.resolve(this.user);
+        return this.$q.resolve(this.user);
     }
 
     isAuthenticated() {

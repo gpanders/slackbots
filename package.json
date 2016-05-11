@@ -2,10 +2,11 @@
   "name": "slackbots",
   "private": true,
   "engines": {
-    "node": "5.11.0"
+    "node": "6.1.0"
   },
   "scripts": {
     "start": "node --harmony dist/index.js",
+    "test": "karma start test/karma.conf.js",
     "postinstall": "webpack"
   },
   "dependencies": {
@@ -41,5 +42,18 @@
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.0"
+  },
+  "devDependencies": {
+    "angular-mocks": "^1.5.5",
+    "chai": "^3.5.0",
+    "chai-as-promised": "^5.3.0",
+    "karma": "^0.13.22",
+    "karma-chai": "^0.1.0",
+    "karma-chai-as-promised": "^0.1.2",
+    "karma-mocha": "^1.0.1",
+    "karma-phantomjs-launcher": "^1.0.0",
+    "karma-webpack": "^1.7.0",
+    "mocha": "^2.4.5",
+    "sinon": "^1.17.4"
   }
 }

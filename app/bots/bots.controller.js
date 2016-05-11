@@ -2,7 +2,8 @@ import { Bot } from './bots.class';
 
 export class BotsCtrl {
     /*@ngInject*/
-    constructor(BotsService, UserService, SlackService) {
+    constructor($q, BotsService, UserService, SlackService) {
+        this.$q = $q;
         this.botsService = BotsService;
         this.userService = UserService;
         this.slackService = SlackService;
@@ -51,7 +52,7 @@ export class BotsCtrl {
             .then(user => {
                 let channel = bot.channel;
                 let message = bot.message;
-                let promise = new Promise((resolve, reject) => {
+                let promise = this.$q((resolve, reject) => {
                     bot.message = '';
                     if (bot.type === 'user') {
                         // channel is user ID
