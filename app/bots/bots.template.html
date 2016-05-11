@@ -16,7 +16,7 @@
         </div>
         <div class="bot__body">
             <div class="row">
-                <div class="col-md-9">
+                <div class="col-xs-9">
                     <form class="bot__title form-group" ng-submit="(editBotname = false) || vm.save(bot)">
                         <div ng-hide="editBotname">
                             <h3 ng-class="{ clickable: !bot.isUser }" ng-click="editBotname = !bot.isUser">{{bot.botname}}</h3>
@@ -35,7 +35,7 @@
                         </div>
                     </form>
                 </div>
-                <div class="col-md-3 text-right">
+                <div class="col-xs-3 text-right">
                     <button
                         type="button"
                         class="btn btn-sm"
@@ -51,14 +51,14 @@
             </div>
             <form ng-submit="vm.send(bot)" ng-show="bot.expanded">
                 <div class="row form-group">
-                    <div class="col-md-3">
+                    <div class="col-xs-3">
                         <label>Post to</label>
                         <select class="form-control" name="type" id="type-select" ng-change="vm.save(bot)" ng-model="bot.type" ng-model-options="{ debounce: 500 }">
                             <option ng-repeat="type in ['User', 'Channel', 'Group']" value="{{type | lowercase}}">{{type}}</option>
                         </select>
                     </div>
 
-                    <div class="col-md-4" ng-show="bot.type == 'user'">
+                    <div class="col-xs-4" ng-show="bot.type == 'user'">
                         <label>Users</label>
                         <select
                             name="user" id="user-select"
@@ -70,7 +70,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4" ng-show="bot.type == 'user'">
+                    <div class="col-xs-4" ng-show="bot.type == 'user'">
                         <label>Post to slackbot or IM?</label>
                         <label class="radio-inline">
                             <input
@@ -90,7 +90,7 @@
                         </label>
                     </div>
 
-                    <div class="col-md-4" ng-show="bot.type == 'channel'">
+                    <div class="col-xs-4" ng-show="bot.type == 'channel'">
                         <label>Channels</label>
                         <select
                             name="channel" id="channel-select"
@@ -102,7 +102,7 @@
                         </select>
                     </div>
 
-                    <div class="col-md-4" ng-show="bot.type == 'group'">
+                    <div class="col-xs-4" ng-show="bot.type == 'group'">
                         <label>Groups</label>
                         <select
                             name="group" id="group-select"
@@ -115,7 +115,7 @@
                     </div>
                 </div>
                 <div class="row form-group">
-                    <div class="col-md-10">
+                    <div class="col-xs-10">
                         <label>Message</label>
                         <input
                             class="form-control"
@@ -127,25 +127,25 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-xs-12">
                         <p class="clickable text-muted" ng-click="bot.attachments = {}"  ng-hide="bot.attachments"><em>Add attachment</em></p>
                         <p class="clickable text-muted" ng-click="bot.attachments = null" ng-show="bot.attachments"><em>Remove attachment</em></p>
                     </div>
                 </div>
                 <div ng-show="bot.attachments">
                     <div class="row form-group">
-                        <div class="col-md-12">
+                        <div class="col-xs-12">
                             <label>Image</label>
                             <div class="bot__attachment-img-container">
                                 <img class="bot__img" ng-show="bot.attachments.imageUrl" ng-src="{{bot.attachments.imageUrl}}" />
                             </div>
                         </div>
-                        <div class="col-md-12">
+                        <div class="col-xs-12">
                             <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#edit-image-modal" ng-click="vm.editAttachmentImage(bot)">{{bot.attachments.imageUrl ? 'Edit' : 'Add'}} Image</button>
                         </div>
                     </div>
                     <div class="row form-group">
-                        <div class="col-md-6">
+                        <div class="col-xs-6">
                             <label>Image Fallback</label>
                             <input
                                 class="form-control"
@@ -158,7 +158,7 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-md-12">
+                    <div class="col-xs-12">
                         <button type="submit" class="btn btn-primary">Send</button>
                     </div>
                 </div>

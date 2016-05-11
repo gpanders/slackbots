@@ -18,10 +18,6 @@ export class BotsCtrl {
         };
     }
 
-    get name() {
-        return 'BotsCtrl';
-    }
-
     newBot() {
         this.botsService.create(new Bot())
             .catch(res => console.error('Failed to add new bot', res));
@@ -37,14 +33,12 @@ export class BotsCtrl {
     }
 
     delete(bot) {
-        if (confirm('Are you sure you want to delete this bot?')) {
-            this.botsService.delete(bot._id)
-                .then(() => {
-                    let pos = this.bots.indexOf(bot);
-                    this.bots.splice(pos, 1);
-                })
-                .catch(res => console.error('Failed to delete bot', res));
-        }
+        this.botsService.delete(bot._id)
+            .then(() => {
+                let pos = this.bots.indexOf(bot);
+                this.bots.splice(pos, 1);
+            })
+            .catch(res => console.error('Failed to delete bot', res));
     }
 
     send(bot) {

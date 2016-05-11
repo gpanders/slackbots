@@ -1,4 +1,4 @@
 import { UserService } from './user.service';
 
 export default angular.module('slackbots.user', [])
-.service(UserService.name, UserService);
+.service('UserService', UserService);

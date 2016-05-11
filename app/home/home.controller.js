@@ -18,10 +18,6 @@ export class HomeCtrl {
         }
     }
 
-    get name() {
-        return 'HomeCtrl';
-    }
-
     get authenticated() {
         return this.userService.isAuthenticated();
     }
@@ -29,13 +25,12 @@ export class HomeCtrl {
     checkToken(token) {
         this.slackService.authorize(token)
             .then(user => {
-                this.userService.setUser(user)
-                    .then(user => this.user = user);
+                this.userService.setUser(user).then(user => this.user = user);
                 this.tokenService.save(token);
                 this.authMessage = 'Authorized! Loading bots...';
                 this.loaded = true;
 
-                this.$state.go('bots').then(() => {
+                this.$state.go('home.bots').then(() => {
                     this.authMessage = '';
                 });
             })
@@ -51,7 +46,7 @@ export class HomeCtrl {
         this.botsService.bots = [];
         this.tokenService.clear();
         this.userService.removeUser();
-        this.$state.go('default');
+        this.$state.go('home');
     }
 
     openModal(field) {

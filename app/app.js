@@ -6,6 +6,7 @@ import Bots from './bots/bots.module';
 
 import FocusOn from './core/focusOn';
 
+import HomeState from './home/home.state';
 import BotsState from './bots/bots.state';
 
 module.exports = angular.module('slackbots', [
@@ -26,10 +27,7 @@ module.exports = angular.module('slackbots', [
     $locationProvider.html5Mode(true);
 
     $stateProvider
-        .state('default', {
-            url: '/',
-            template: ''
-        })
-        .state('bots', BotsState);
+        .state('home', HomeState)
+        .state('home.bots', BotsState);
 })
 .directive('focusOn', FocusOn);

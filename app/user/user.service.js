@@ -4,10 +4,6 @@ export class UserService {
         this.$q = $q;
     }
 
-    get name() {
-        return 'User Service';
-    }
-
     getUser() {
         if (this.isAuthenticated()) {
             return this.$q.resolve(this.user);

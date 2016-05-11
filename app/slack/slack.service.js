@@ -6,10 +6,6 @@ export class SlackService {
         this.userService = UserService;
     }
 
-    get name() {
-        return 'SlackService';
-    }
-
     authorize(token) {
         return this.$q((resolve, reject) => {
             this.$http({

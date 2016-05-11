@@ -21,10 +21,6 @@ input[disabled] {
     cursor: move;
 }
 
-._hidden {
-    display: none;
-}
-
 /* Everything but the jumbotron gets side spacing for mobile first views */
 .header,
 .marketing,
@@ -33,11 +29,13 @@ input[disabled] {
   padding-right: 15px;
 }
 
+.auth-panel {
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 20px;
+}
+
 /* Custom page header */
 .header {
-  border-bottom: 1px solid #e5e5e5;
-  margin-bottom: 10px;
-
   /* Make the masthead heading the same height as the navigation */
   h3 {
     margin-top: 0;
@@ -92,7 +90,7 @@ input[disabled] {
 }
 /* Space out the masthead */
 .header {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 /* Remove the bottom border on the jumbotron for visual effect */
 .jumbotron {

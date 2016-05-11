@@ -4,10 +4,6 @@ export class TokenService {
         this.store = store.getNamespacedStore('slackbots');
     }
 
-    get name() {
-        return 'TokenService';
-    }
-
     get() {
         return this.store.get('token');
     }
