@@ -8,6 +8,8 @@ export class BotsCtrl {
         this.userService = UserService;
         this.slackService = SlackService;
 
+        this.modal = {};
+
         this.botsService.getAll().then(bots => this.bots = bots);
         this.slackService.getData('users').then(users => this.users = users);
         this.slackService.getData('groups').then(groups => this.groups = groups);
@@ -20,6 +22,7 @@ export class BotsCtrl {
 
     newBot() {
         this.botsService.create(new Bot())
+            .then(bot => this.bots.unshift(bot))
             .catch(res => console.error('Failed to add new bot', res));
     }
 
@@ -84,5 +87,26 @@ export class BotsCtrl {
                         .catch(res => console.error(res));
                 });
             });
+    }
+
+
+    openModal(field) {
+        this.modal.field = field;
+        this.imageUrlValue = field.imageUrl;
+    }
+
+    editBotImage(bot) {
+        this.openModal(bot);
+    }
+
+    editAttachmentImage(bot) {
+        this.openModal(bot.attachments);
+    }
+
+    modalSubmit(url) {
+        this.modal.field.imageUrl = url;
+        if (this.modal.field.hasOwnProperty('unsaved')) {
+            this.modal.field.unsaved = true;
+        }
     }
 }

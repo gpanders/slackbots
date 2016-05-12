@@ -8,12 +8,13 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanPlugin = require('clean-webpack-plugin');
 const AssetsPlugin = require('assets-webpack-plugin');
 
-const isProd = process.env.NODE_ENV === 'production';
-
 const PUBLIC_PATH = 'js';
 const DIST_PATH = path.join(__dirname, 'dist');
 const BUILD_PATH = path.join(DIST_PATH, 'public');
 const ASSETS_PATH = path.join(BUILD_PATH, PUBLIC_PATH);
+
+const env = process.env.NODE_ENV || 'development';
+const isDev = env === 'development';
 
 let config = {};
 
@@ -24,7 +25,7 @@ config.entry = {
 
 config.output = {
     path: ASSETS_PATH,
-    filename: '[name]' + (isProd ? '.[hash]' : '') + '.js',
+    filename: '[name]' + (!isDev ? '.[hash]' : '') + '.js',
     publicPath: `/${PUBLIC_PATH}/`
 };
 
@@ -62,7 +63,7 @@ config.postcss = [ autoprefixer ];
 config.plugins = [
     new webpack.optimize.CommonsChunkPlugin(
         /* chunkName= */'vendor',
-        /* filename= */'vendor' + (isProd ? '.[hash]' : '') + '.js'),
+        /* filename= */'vendor' + (!isDev ? '.[hash]' : '') + '.js'),
 
     new CleanPlugin(BUILD_PATH),
 
@@ -73,7 +74,7 @@ config.plugins = [
     })
 ];
 
-if (isProd) {
+if (!isDev) {
     config.plugins.push(new webpack.optimize.UglifyJsPlugin({
         compress: {
             warnings: false
@@ -84,9 +85,10 @@ if (isProd) {
     }));
 }
 
-if (!isProd) {
+if (isDev) {
     config.cache = true;
-    config.devtool = 'eval';
+    config.debug = true;
+    config.devtool = 'source-map';
     config.watch = true;
 }
 

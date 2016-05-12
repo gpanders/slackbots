@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node --harmony dist/index.js",
     "test": "karma start test/karma.conf.js",
-    "postinstall": "webpack"
+    "postinstall": "npm run build",
+    "build": "webpack"
   },
   "dependencies": {
     "angular": "^1.5.5",

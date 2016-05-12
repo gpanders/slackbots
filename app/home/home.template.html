@@ -33,33 +33,4 @@
   </div>
 </div>
 
-<div class="container">
-  <div ui-view></div>
-</div>
-
-<div id="edit-image-modal" class="modal fade">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
-        <h4 class="modal-title">Edit Image URL</h4>
-      </div>
-      <div class="modal-body">
-        <div class="form-group">
-          <input
-            type="text"
-            name="imageUrl" id="image-url-input"
-            class="form-control"
-            placeholder="Image URL..."
-            ng-model="imageUrlValue "
-          />
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="vm.modalSubmit()">Remove Image</button>
-        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary" data-dismiss="modal" ng-click="vm.modalSubmit(imageUrlValue)">Save</button>
-      </div>
-    </div>
-  </div>
-</div>
+<div ui-view></div>

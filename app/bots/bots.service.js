@@ -9,10 +9,6 @@ export class BotsService {
         this.bots = [];
     }
 
-    get name() {
-        return 'BotsService';
-    }
-
     _error(reject) {
         this.bots = [];
         return () => reject('No authenticated user found');

@@ -7,8 +7,6 @@ export class HomeCtrl {
         this.userService = UserService;
         this.botsService = BotsService;
 
-        this.modal = {};
-
         let token = this.tokenService.get();
 
         this.loaded = !token;
@@ -47,25 +45,5 @@ export class HomeCtrl {
         this.tokenService.clear();
         this.userService.removeUser();
         this.$state.go('home');
-    }
-
-    openModal(field) {
-        this.modal.field = field;
-        this.imageUrlValue = field.imageUrl;
-    }
-
-    editBotImage(bot) {
-        this.openModal(bot);
-    }
-
-    editAttachmentImage(bot) {
-        this.openModal(bot.attachments);
-    }
-
-    modalSubmit(url) {
-        this.modal.field.imageUrl = url;
-        if (this.modal.field.hasOwnProperty('unsaved')) {
-            this.modal.field.unsaved = true;
-        }
     }
 }

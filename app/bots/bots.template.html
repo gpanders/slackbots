@@ -1,168 +1,197 @@
-<div class="row">
-    <div class="col-12 text-center">
-        <button type="button" class="btn btn-default" ng-click="vm.newBot()">Add Bot</button>
-    </div>
+<div class="container">
+  <div class="row">
+      <div class="col-12 text-center">
+          <button type="button" class="btn btn-default" ng-click="vm.newBot()">Add Bot</button>
+      </div>
+  </div>
+  <div class="spacer"></div>
+  <div id="bot-list" ui-sortable="vm.sortOpts" ng-model="vm.bots">
+      <div ng-repeat="bot in vm.bots" class="bot__row moveable" ng-class="{ 'collapsed': !bot.expanded }" data-bot-id="{{bot._id}}">
+          <div class="bot__collapse-expand clickable" ng-click="bot.expanded = !bot.expanded">
+              <i class="glyphicon glyphicon-minus" ng-show="bot.expanded"></i>
+              <i class="glyphicon glyphicon-plus" ng-hide="bot.expanded"></i>
+          </div>
+          <div class="bot__img-container">
+              <img class="bot__img" ng-src="{{bot.imageUrl}}" ng-show="bot.imageUrl" />
+              <button class="btn btn-sm btn-default" ng-hide="bot.isUser" data-toggle="modal" data-target="#edit-image-modal" ng-click="vm.editBotImage(bot)">{{bot.imageUrl ? 'Edit' : 'Add'}} Image</button>
+          </div>
+          <div class="bot__body">
+              <div class="row">
+                  <div class="col-xs-9">
+                      <form class="bot__title form-group" ng-submit="(editBotname = false) || vm.save(bot)">
+                          <div ng-hide="editBotname">
+                              <h3 ng-class="{ clickable: !bot.isUser }" ng-click="editBotname = !bot.isUser">{{bot.botname}}</h3>
+                          </div>
+                          <div ng-show="editBotname">
+                              <input
+                                  class="form-control"
+                                  type="text"
+                                  name="botname" id="botname-input"
+                                  placeholder="Bot Name"
+                                  ng-model="bot.botname"
+                                  ng-blur="editBotname = false"
+                                  focus-on="editBotname"
+                              />
+                              <input type="submit" ng-hide="true" />
+                          </div>
+                      </form>
+                  </div>
+                  <div class="col-xs-3 text-right">
+                      <button
+                          type="button"
+                          class="btn btn-sm"
+                          ng-hide="bot.isUser"
+                          ng-class="{ 'btn-default': !deleteHover, 'btn-danger': deleteHover }"
+                          ng-mouseenter="deleteHover = true"
+                          ng-mouseleave="deleteHover = false"
+                          ng-click="vm.delete(bot)">
+                              <i class="glyphicon glyphicon-remove"></i>
+                      </button>
+                      <label ng-show="bot.isUser" class="bot__user-label">YOU</label>
+                  </div>
+              </div>
+              <form ng-submit="vm.send(bot)" ng-show="bot.expanded">
+                  <div class="row form-group">
+                      <div class="col-xs-3">
+                          <label>Post to</label>
+                          <select class="form-control" name="type" id="type-select" ng-change="vm.save(bot)" ng-model="bot.type" ng-model-options="{ debounce: 500 }">
+                              <option ng-repeat="type in ['User', 'Channel', 'Group']" value="{{type | lowercase}}">{{type}}</option>
+                          </select>
+                      </div>
+
+                      <div class="col-xs-4" ng-show="bot.type == 'user'">
+                          <label>Users</label>
+                          <select
+                              name="user" id="user-select"
+                              class="form-control"
+                              ng-model="bot.channel"
+                              ng-change="vm.save(bot)"
+                              ng-model-options="{ debounce: 500 }"
+                              ng-options="id as user.name for (id, user) in vm.users">
+                          </select>
+                      </div>
+
+                      <div class="col-xs-4" ng-show="bot.type == 'user'">
+                          <label>Post to slackbot or IM?</label>
+                          <label class="radio-inline">
+                              <input
+                                  type="radio"
+                                  name="userChannel"
+                                  ng-checked="bot.postAsSlackbot"
+                                  ng-click="(bot.postAsSlackbot = true) || vm.save(bot)"
+                              />slackbot
+                          </label>
+                          <label class="radio-inline">
+                              <input
+                                  type="radio"
+                                  name="userChannel"
+                                  ng-checked="!bot.postAsSlackbot"
+                                  ng-click="(bot.postAsSlackbot = false) || vm.save(bot)"
+                              />IM
+                          </label>
+                      </div>
+
+                      <div class="col-xs-4" ng-show="bot.type == 'channel'">
+                          <label>Channels</label>
+                          <select
+                              name="channel" id="channel-select"
+                              class="form-control"
+                              ng-model="bot.channel"
+                              ng-change="vm.save(bot)"
+                              ng-model-options="{ debounce: 500 }"
+                              ng-options="id as channel for (id, channel) in vm.channels">
+                          </select>
+                      </div>
+
+                      <div class="col-xs-4" ng-show="bot.type == 'group'">
+                          <label>Groups</label>
+                          <select
+                              name="group" id="group-select"
+                              class="form-control"
+                              ng-model="bot.channel"
+                              ng-change="vm.save(bot)"
+                              ng-model-options="{ debounce: 500 }"
+                              ng-options="id as group for (id, group) in vm.groups">
+                          </select>
+                      </div>
+                  </div>
+                  <div class="row form-group">
+                      <div class="col-xs-10">
+                          <label>Message</label>
+                          <input
+                              class="form-control"
+                              type="text"
+                              name="message" id="message-input"
+                              placeholder="Enter message here..."
+                              ng-model="bot.message"
+                          />
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-xs-12">
+                          <p class="clickable text-muted" ng-click="bot.attachments = {}"  ng-hide="bot.attachments"><em>Add attachment</em></p>
+                          <p class="clickable text-muted" ng-click="bot.attachments = null" ng-show="bot.attachments"><em>Remove attachment</em></p>
+                      </div>
+                  </div>
+                  <div ng-show="bot.attachments">
+                      <div class="row form-group">
+                          <div class="col-xs-12">
+                              <label>Image</label>
+                              <div class="bot__attachment-img-container">
+                                  <img class="bot__img" ng-show="bot.attachments.imageUrl" ng-src="{{bot.attachments.imageUrl}}" />
+                              </div>
+                          </div>
+                          <div class="col-xs-12">
+                              <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#edit-image-modal" ng-click="vm.editAttachmentImage(bot)">{{bot.attachments.imageUrl ? 'Edit' : 'Add'}} Image</button>
+                          </div>
+                      </div>
+                      <div class="row form-group">
+                          <div class="col-xs-6">
+                              <label>Image Fallback</label>
+                              <input
+                                  class="form-control"
+                                  type="text"
+                                  name="fallback" id="fallback-input"
+                                  placeholder="Image fallback text..."
+                                  ng-model="bot.attachments.fallback"
+                              />
+                          </div>
+                      </div>
+                  </div>
+                  <div class="row">
+                      <div class="col-xs-12">
+                          <button type="submit" class="btn btn-primary">Send</button>
+                      </div>
+                  </div>
+              </form>
+          </div>
+      </div>
+  </div>
 </div>
-<div class="spacer"></div>
-<div id="bot-list" ui-sortable="vm.sortOpts" ng-model="vm.bots">
-    <div ng-repeat="bot in vm.bots" class="bot__row moveable" ng-class="{ 'collapsed': !bot.expanded }" data-bot-id="{{bot._id}}">
-        <div class="bot__collapse-expand clickable" ng-click="bot.expanded = !bot.expanded">
-            <i class="glyphicon glyphicon-minus" ng-show="bot.expanded"></i>
-            <i class="glyphicon glyphicon-plus" ng-hide="bot.expanded"></i>
+
+<div id="edit-image-modal" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"><span>&times;</span></button>
+        <h4 class="modal-title">Edit Image URL</h4>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <input
+            type="text"
+            name="imageUrl" id="image-url-input"
+            class="form-control"
+            placeholder="Image URL..."
+            ng-model="imageUrlValue "
+          />
         </div>
-        <div class="bot__img-container">
-            <img class="bot__img" ng-src="{{bot.imageUrl}}" ng-show="bot.imageUrl" />
-            <button class="btn btn-sm btn-default" ng-hide="bot.isUser" data-toggle="modal" data-target="#edit-image-modal" ng-click="vm.editBotImage(bot)">{{bot.imageUrl ? 'Edit' : 'Add'}} Image</button>
-        </div>
-        <div class="bot__body">
-            <div class="row">
-                <div class="col-xs-9">
-                    <form class="bot__title form-group" ng-submit="(editBotname = false) || vm.save(bot)">
-                        <div ng-hide="editBotname">
-                            <h3 ng-class="{ clickable: !bot.isUser }" ng-click="editBotname = !bot.isUser">{{bot.botname}}</h3>
-                        </div>
-                        <div ng-show="editBotname">
-                            <input
-                                class="form-control"
-                                type="text"
-                                name="botname" id="botname-input"
-                                placeholder="Bot Name"
-                                ng-model="bot.botname"
-                                ng-blur="editBotname = false"
-                                focus-on="editBotname"
-                            />
-                            <input type="submit" ng-hide="true" />
-                        </div>
-                    </form>
-                </div>
-                <div class="col-xs-3 text-right">
-                    <button
-                        type="button"
-                        class="btn btn-sm"
-                        ng-hide="bot.isUser"
-                        ng-class="{ 'btn-default': !deleteHover, 'btn-danger': deleteHover }"
-                        ng-mouseenter="deleteHover = true"
-                        ng-mouseleave="deleteHover = false"
-                        ng-click="vm.delete(bot)">
-                            <i class="glyphicon glyphicon-remove"></i>
-                    </button>
-                    <label ng-show="bot.isUser" class="bot__user-label">YOU</label>
-                </div>
-            </div>
-            <form ng-submit="vm.send(bot)" ng-show="bot.expanded">
-                <div class="row form-group">
-                    <div class="col-xs-3">
-                        <label>Post to</label>
-                        <select class="form-control" name="type" id="type-select" ng-change="vm.save(bot)" ng-model="bot.type" ng-model-options="{ debounce: 500 }">
-                            <option ng-repeat="type in ['User', 'Channel', 'Group']" value="{{type | lowercase}}">{{type}}</option>
-                        </select>
-                    </div>
-
-                    <div class="col-xs-4" ng-show="bot.type == 'user'">
-                        <label>Users</label>
-                        <select
-                            name="user" id="user-select"
-                            class="form-control"
-                            ng-model="bot.channel"
-                            ng-change="vm.save(bot)"
-                            ng-model-options="{ debounce: 500 }"
-                            ng-options="id as user.name for (id, user) in vm.users">
-                        </select>
-                    </div>
-
-                    <div class="col-xs-4" ng-show="bot.type == 'user'">
-                        <label>Post to slackbot or IM?</label>
-                        <label class="radio-inline">
-                            <input
-                                type="radio"
-                                name="userChannel"
-                                ng-checked="bot.postAsSlackbot"
-                                ng-click="(bot.postAsSlackbot = true) || vm.save(bot)"
-                            />slackbot
-                        </label>
-                        <label class="radio-inline">
-                            <input
-                                type="radio"
-                                name="userChannel"
-                                ng-checked="!bot.postAsSlackbot"
-                                ng-click="(bot.postAsSlackbot = false) || vm.save(bot)"
-                            />IM
-                        </label>
-                    </div>
-
-                    <div class="col-xs-4" ng-show="bot.type == 'channel'">
-                        <label>Channels</label>
-                        <select
-                            name="channel" id="channel-select"
-                            class="form-control"
-                            ng-model="bot.channel"
-                            ng-change="vm.save(bot)"
-                            ng-model-options="{ debounce: 500 }"
-                            ng-options="id as channel for (id, channel) in vm.channels">
-                        </select>
-                    </div>
-
-                    <div class="col-xs-4" ng-show="bot.type == 'group'">
-                        <label>Groups</label>
-                        <select
-                            name="group" id="group-select"
-                            class="form-control"
-                            ng-model="bot.channel"
-                            ng-change="vm.save(bot)"
-                            ng-model-options="{ debounce: 500 }"
-                            ng-options="id as group for (id, group) in vm.groups">
-                        </select>
-                    </div>
-                </div>
-                <div class="row form-group">
-                    <div class="col-xs-10">
-                        <label>Message</label>
-                        <input
-                            class="form-control"
-                            type="text"
-                            name="message" id="message-input"
-                            placeholder="Enter message here..."
-                            ng-model="bot.message"
-                        />
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-12">
-                        <p class="clickable text-muted" ng-click="bot.attachments = {}"  ng-hide="bot.attachments"><em>Add attachment</em></p>
-                        <p class="clickable text-muted" ng-click="bot.attachments = null" ng-show="bot.attachments"><em>Remove attachment</em></p>
-                    </div>
-                </div>
-                <div ng-show="bot.attachments">
-                    <div class="row form-group">
-                        <div class="col-xs-12">
-                            <label>Image</label>
-                            <div class="bot__attachment-img-container">
-                                <img class="bot__img" ng-show="bot.attachments.imageUrl" ng-src="{{bot.attachments.imageUrl}}" />
-                            </div>
-                        </div>
-                        <div class="col-xs-12">
-                            <button type="button" class="btn btn-xs btn-default" data-toggle="modal" data-target="#edit-image-modal" ng-click="vm.editAttachmentImage(bot)">{{bot.attachments.imageUrl ? 'Edit' : 'Add'}} Image</button>
-                        </div>
-                    </div>
-                    <div class="row form-group">
-                        <div class="col-xs-6">
-                            <label>Image Fallback</label>
-                            <input
-                                class="form-control"
-                                type="text"
-                                name="fallback" id="fallback-input"
-                                placeholder="Image fallback text..."
-                                ng-model="bot.attachments.fallback"
-                            />
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-xs-12">
-                        <button type="submit" class="btn btn-primary">Send</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default pull-left" data-dismiss="modal" ng-click="vm.modalSubmit()">Remove Image</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary" data-dismiss="modal" ng-click="vm.modalSubmit(imageUrlValue)">Save</button>
+      </div>
     </div>
+  </div>
 </div>
