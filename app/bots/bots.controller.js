@@ -11,9 +11,11 @@ export class BotsCtrl {
         this.modal = {};
 
         this.botsService.getAll().then(bots => this.bots = bots);
-        this.slackService.getData('users').then(users => this.users = users);
-        this.slackService.getData('groups').then(groups => this.groups = groups);
-        this.slackService.getData('channels').then(channels => this.channels = channels);
+        this.slackService.getData().then(data => {
+            this.channels = data.channels;
+            this.groups = data.groups;
+            this.users = data.users;
+        });
 
         this.sortOpts = {
             stop: () => this.botsService.updateIndices()
@@ -45,48 +47,11 @@ export class BotsCtrl {
     }
 
     send(bot) {
-        this.userService.getUser()
-            .then(user => {
-                let channel = bot.channel;
-                let message = bot.message;
-                let promise = this.$q((resolve, reject) => {
-                    bot.message = '';
-                    if (bot.type === 'user') {
-                        // channel is user ID
-                        if (!bot.postAsSlackbot) {
-                            if (this.users[channel].im) {
-                                resolve(this.users[channel].im);
-                            } else {
-                                this.slackService.openIM(channel).then(resolve);
-                            }
-                        } else {
-                            resolve(channel);
-                        }
-                    } else {
-                        resolve(channel);
-                    }
-                });
-
-                promise.then(channel => {
-                    var data = {
-                        channel: channel,
-                        text: message,
-                        username: bot.botname,
-                        icon_url: bot.imageUrl,
-                        as_user: bot.isUser
-                    };
-
-                    if (bot.attachments) {
-                        data.attachments = JSON.stringify([{
-                            fallback: bot.attachments.fallback,
-                            image_url: bot.attachments.imageUrl
-                        }]);
-                    }
-
-                    this.slackService.postMessage(data)
-                        .catch(res => console.error(res));
-                });
-            });
+        let message = bot.message;
+        bot.message = '';
+        this.botsService.send(bot, message)
+            .then(res => console.log(res))
+            .catch(res => console.error(res));
     }
 
 

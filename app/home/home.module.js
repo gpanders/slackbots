@@ -8,6 +8,7 @@ import { HomeCtrl } from './home.controller';
 import './home.styles';
 
 export default angular.module('slackbots.home', [
+    'ui.router',
     User.name,
     Token.name,
     Slack.name,

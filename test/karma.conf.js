@@ -1,8 +1,10 @@
 // Karma configuration
 // Generated on Tue May 10 2016 16:00:01 GMT-0500 (CDT)
 var webpackConfig = require('../webpack.config');
+
 webpackConfig.entry = {};
 webpackConfig.plugins = [];
+webpackConfig.cache = false;
 
 module.exports = function(config) {
   config.set({
@@ -14,6 +16,12 @@ module.exports = function(config) {
     // frameworks to use
     // available frameworks: https://npmjs.org/browse/keyword/karma-adapter
     frameworks: ['mocha', 'chai-as-promised', 'chai'],
+
+    client: {
+        chai: {
+            includeStack: true
+        }
+    },
 
 
     // list of files / patterns to load in the browser

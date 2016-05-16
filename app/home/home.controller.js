@@ -21,7 +21,7 @@ export class HomeCtrl {
     }
 
     checkToken(token) {
-        this.slackService.authorize(token)
+        this.slackService.getUserInfo(token)
             .then(user => {
                 this.userService.setUser(user).then(user => this.user = user);
                 this.tokenService.save(token);

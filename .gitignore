@@ -1,4 +1,5 @@
 node_modules/
+apidoc/
 .sass-cache
 .editorconfig
 .gitattributes

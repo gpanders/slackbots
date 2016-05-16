@@ -27,7 +27,7 @@ describe('UserService', () => {
     });
 
     describe('when user authenticates', () => {
-        let mockUser = { id: 1 };
+        let mockUser = { name: 'test', id: 1 };
 
         it('should set the user and return user asynchronously', done => {
             expect(UserService.setUser(mockUser)).to.eventually.become(mockUser).notify(done);

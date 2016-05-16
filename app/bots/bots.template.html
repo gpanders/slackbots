@@ -67,7 +67,7 @@
                               ng-model="bot.channel"
                               ng-change="vm.save(bot)"
                               ng-model-options="{ debounce: 500 }"
-                              ng-options="id as user.name for (id, user) in vm.users">
+                              ng-options="id as user for (id, user) in vm.users">
                           </select>
                       </div>
 
