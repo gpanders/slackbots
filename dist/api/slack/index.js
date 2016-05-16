@@ -51,7 +51,7 @@ router.get('', (req, res) => {
                         .forEach(member =>
                             { slack.users[member.id] = `@${member.name}`; });
 
-                    log.debug(`Returning ${slack.channels.length} channels, ${slack.groups.length} groups, and ${slack.users.length} users`);
+                    log.debug(`Found ${Object.keys(slack.channels).length} channels, ${Object.keys(slack.groups).length} groups, and ${Object.keys(slack.users).length} users`);
                     return res.json(slack);
                 })
                 .catch(e => res.status(500).end(e))
