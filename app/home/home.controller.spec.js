@@ -1,5 +1,4 @@
 import { HomeController } from './home.controller';
-import { SlackService } from '../slack';
 
 describe(HomeController, () => {
 

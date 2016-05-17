@@ -163,7 +163,7 @@ router.delete('/:id', (req, res, next) => {
             return res.status(404).end();
         }
 
-        bot.remove((err, bot) => {
+        bot.remove(err => {
             if (err) {
                 logger.error(`Error in DELETE /bots/delete/${req.params.id}: ${err}`);
                 return next(err);
@@ -215,7 +215,7 @@ router.post('/:id/send', (req, res, next) => {
 
             let params = {
                 'username': bot.botname,
-                'icon_url': bot.imageUrl,
+                'icon_url': bot.imageUrl
             };
 
             new Promise((resolve, reject) => {

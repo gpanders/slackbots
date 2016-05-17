@@ -21,7 +21,7 @@ describe(BotService, () => {
         angular.mock.module($provide => {
             $provide.service(SlackService, class {
                 constructor() {}
-                getUserInfo(userId) {
+                getUserInfo() {
                     return $q.resolve(user);
                 }
             });
@@ -38,7 +38,7 @@ describe(BotService, () => {
         _userService.setUser(user);
 
         $httpBackend.whenPOST(/^\/api\/bots$/)
-            .respond((method, url, data, headers, params) => {
+            .respond((method, url, data) => {
                 let bot = angular.fromJson(data);
                 if (angular.isUndefined(bot._id)) {
                     bot._id = String(Math.floor(Math.random() * 1000000));

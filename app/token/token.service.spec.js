@@ -3,13 +3,11 @@ import { TokenService } from './token.service';
 describe(TokenService, () => {
 
     let _tokenService;
-    let $rootScope;
 
     beforeEach(angular.mock.module(TokenService));
 
-    beforeEach(angular.mock.inject((_TokenService_, _$rootScope_) => {
+    beforeEach(angular.mock.inject((_TokenService_) => {
         _tokenService = _TokenService_;
-        $rootScope = _$rootScope_;
     }));
 
     it('should retrieve the token after saving it', done => {

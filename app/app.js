@@ -1,7 +1,7 @@
 import { HomeModule, HomeState } from './home';
 import { BotsModule, BotsState } from './bots';
 
-module.exports = angular.module('slackbots', [
+export default angular.module('slackbots', [
     'ui.router',
     HomeModule,
     BotsModule
