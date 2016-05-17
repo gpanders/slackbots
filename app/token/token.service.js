@@ -1,4 +1,7 @@
-export class TokenService {
+export const TokenService = angular.module('TokenService', [
+    'angular-storage'
+])
+.service('TokenService', class TokenService {
     /*@ngInject*/
     constructor(store) {
         this.store = store.getNamespacedStore('slackbots');
@@ -15,4 +18,4 @@ export class TokenService {
     clear() {
         return this.store.remove('token');
     }
-}
+}).name;

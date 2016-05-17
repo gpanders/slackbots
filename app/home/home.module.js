@@ -1,17 +1,7 @@
-import User from '../user/user.module';
-import Token from '../token/token.module';
-import Slack from '../slack/slack.module';
-import Bots from '../bots/bots.module';
+import { HomeController } from './home.controller';
 
-import { HomeCtrl } from './home.controller';
+import './home.module.scss';
 
-import './home.styles';
-
-export default angular.module('slackbots.home', [
-    'ui.router',
-    User.name,
-    Token.name,
-    Slack.name,
-    Bots.name
-])
-.controller('HomeCtrl', HomeCtrl);
+export const HomeModule = angular.module('slackbots.home', [
+    HomeController
+]).name;

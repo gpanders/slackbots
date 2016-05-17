@@ -27,6 +27,12 @@ router.get('', (req, res) => {
             users: {}
         };
 
+        bot.on('error', err => {
+            log.error(err);
+            res.status(500).end(err);
+            bot.close();
+        });
+
         bot.on('start', () => {
             Promise.all([bot.getChannels(), bot.getGroups(), bot.getUsers()])
                 .then(values => {

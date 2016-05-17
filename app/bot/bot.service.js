@@ -1,8 +1,16 @@
-export class BotsService {
+import { UserService } from '../user';
+import { SlackService } from '../slack';
+
+export const BotService = angular.module('BotService', [
+    UserService,
+    SlackService
+])
+.service('BotService', class BotService {
     /*@ngInject*/
-    constructor($http, $q, UserService, SlackService) {
+    constructor($http, $q, $log, UserService, SlackService) {
         this.$http = $http;
         this.$q = $q;
+        this.$log = $log;
         this.userService = UserService;
         this.slackService = SlackService;
 
@@ -146,4 +154,4 @@ export class BotsService {
             });
             */
     }
-}
+}).name;

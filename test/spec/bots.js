@@ -1,27 +1,26 @@
 const request = require('supertest');
-const expect = require('chai').expect;
+let expect = require('chai').expect;
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
-const Logger = require('../../lib/logger');
-
-const log = new Logger();
 
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI;
 
-const userId = 'TEST12345';
+const TEST_USER_ID = 'TEST12345';
+
+const Bots = require('../../dist/api/bots');
 
 function createServer() {
     let app = express();
     app.use(bodyParser.json());
-    app.use('/api/bots', require('../../api/bots'));
-    return app.listen(PORT, () => log.info(`Test server started and running on port ${PORT}`));
+    app.use('/api/bots', Bots);
+    return app.listen(PORT);
 }
 
 // Original data to POST
 let testBot = {
-    userId: userId,
+    userId: TEST_USER_ID,
     botname: 'Test Bot',
     index: 0
 };
@@ -37,7 +36,10 @@ const update = {
 describe('Bots API', () => {
     let server;
 
-    before(() => mongoose.connect(MONGO_URI));
+    before(() => {
+        mongoose.connect(MONGO_URI);
+        mongoose.model('Bot').find({ userId: TEST_USER_ID }).remove();
+    });
 
     beforeEach(() => server = createServer());
 
@@ -63,7 +65,7 @@ describe('Bots API', () => {
 
     it('retrieves newly created bot', done => {
         request(server)
-            .get(`/api/bots?userId=${userId}`)
+            .get(`/api/bots?userId=${TEST_USER_ID}`)
             .expect(200)
             .end((err, res) => {
                 if (err) { return done(err); }
@@ -74,14 +76,12 @@ describe('Bots API', () => {
     });
 
     it('can update the bot', done => {
-        log.info('testBot._id = ' + testBot._id);
         request(server)
             .put(`/api/bots/${testBot._id}`)
             .send(update)
             .expect(200)
             .end((err, res) => {
                 if (err) { return done(err); }
-                log.info(res.body);
                 expect(res.body.index).to.equal(update.index);
                 expect(res.body.botname).to.equal(update.botname);
                 expect(res.body.postAsSlackbot).to.equal(update.postAsSlackbot);
@@ -91,7 +91,7 @@ describe('Bots API', () => {
 
     it('correctly retrieves updated bot', done => {
         request(server)
-            .get(`/api/bots?userId=${userId}`)
+            .get(`/api/bots?userId=${TEST_USER_ID}`)
             .expect(200)
             .end((err, res) => {
                 if (err) { return done(err); }

@@ -30,31 +30,18 @@ config.output = {
 };
 
 config.resolve = {
-    extensions: ['', '.js', '.scss']
+    extensions: ['', '.js']
 };
 
 config.module = {
     loaders: [
-        {
-            test: /\.js$/,
-            loader: 'ng-annotate!babel?presets[]=es2015!jshint',
-            exclude: /node_modules|bower_components/
-        }, {
-            test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/,
-            loader: 'url?limit=10000'
-        }, {
-            test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/,
-            loader: 'file'
-        },
-        { test: /\.html$/, loader: 'html' },
-        {
-            test: /\.css$/,
-            loader: 'style!css!postcss'
-        }, {
-            test: /\.scss$/,
-            loader: 'style!css!postcss!sass'
-        },
-        { test: /bootstrap-sass\/assets\/javascripts\//, loader: 'imports?jQuery=jquery' },
+        { test: /\.js$/, loader: 'ng-annotate!babel?presets[]=es2015!jshint', exclude: /node_modules|bower_components/ },
+        { test: /\.woff2?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url?limit=10000' },
+        { test: /\.(ttf|eot|svg)(\?[\s\S]+)?$/, loader: 'file' },
+        { test: /\.html$/, loader: 'raw' },
+        { test: /\.css$/, loader: 'style!css!postcss' },
+        { test: /\.scss$/, loader: 'style!css!postcss!sass' },
+        { test: /jquery\.js$/, loader: 'expose?$!expose?jQuery' }
     ]
 };
 
@@ -64,6 +51,11 @@ config.plugins = [
     new webpack.optimize.CommonsChunkPlugin(
         /* chunkName= */'vendor',
         /* filename= */'vendor' + (!isDev ? '.[hash]' : '') + '.js'),
+
+    new webpack.ProvidePlugin({
+        $: 'jquery',
+        jQuery: 'jquery'
+    }),
 
     new CleanPlugin(BUILD_PATH),
 

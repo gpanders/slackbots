@@ -1,11 +1,7 @@
-import User from '../user/user.module';
-import Slack from '../slack/slack.module';
+import { BotsController } from './bots.controller';
 
-import { BotsCtrl } from './bots.controller';
-import { BotsService } from './bots.service';
+import './bots.module.scss';
 
-import './bots.styles';
-
-export default angular.module('slackbots.bots', [Slack.name, User.name])
-.controller('BotsCtrl', BotsCtrl)
-.service('BotsService', BotsService);
+export const BotsModule = angular.module('slackbots.bots', [
+    BotsController
+]).name;

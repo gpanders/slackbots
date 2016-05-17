@@ -1,9 +1,8 @@
-import BotsTemplate from './bots.template.html';
-import { BotsCtrl } from './bots.controller';
+import { BotsController } from './bots.controller';
 
-export default {
+export const BotsState = {
     url: '',
-    template: BotsTemplate,
-    controller: 'BotsCtrl',
+    template: require('./bots.module.html'),
+    controller: BotsController,
     controllerAs: 'vm'
 };

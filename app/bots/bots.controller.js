@@ -1,16 +1,26 @@
-import { Bot } from './bots.class';
+import { Bot, BotService } from '../bot';
+import { UserService } from '../user';
+import { SlackService } from '../slack';
+import { FocusOn } from '../shared/focusOn';
 
-export class BotsCtrl {
+export const BotsController = angular.module('BotsController', [
+    BotService,
+    UserService,
+    SlackService
+])
+.directive('focusOn', FocusOn)
+.controller('BotsController', class BotsController {
     /*@ngInject*/
-    constructor($q, BotsService, UserService, SlackService) {
+    constructor($q, $log, BotService, UserService, SlackService) {
         this.$q = $q;
-        this.botsService = BotsService;
+        this.$log = $log;
+        this.botService = BotService;
         this.userService = UserService;
         this.slackService = SlackService;
 
         this.modal = {};
 
-        this.botsService.getAll().then(bots => this.bots = bots);
+        this.botService.getAll().then(bots => this.bots = bots);
         this.slackService.getData().then(data => {
             this.channels = data.channels;
             this.groups = data.groups;
@@ -18,14 +28,14 @@ export class BotsCtrl {
         });
 
         this.sortOpts = {
-            stop: () => this.botsService.updateIndices()
+            stop: () => this.botService.updateIndices()
         };
     }
 
     newBot() {
-        this.botsService.create(new Bot())
+        this.botService.create(new Bot())
             .then(bot => this.bots.unshift(bot))
-            .catch(res => console.error('Failed to add new bot', res));
+            .catch(res => this.$log.error('Failed to add new bot', res));
     }
 
     save(bot) {
@@ -33,25 +43,25 @@ export class BotsCtrl {
             return;
         }
 
-        this.botsService.update(bot)
-            .catch(res => console.error('Failed to save bot', res));
+        this.botService.update(bot)
+            .catch(res => this.$log.error('Failed to save bot', res));
     }
 
     delete(bot) {
-        this.botsService.delete(bot._id)
+        this.botService.delete(bot._id)
             .then(() => {
                 let pos = this.bots.indexOf(bot);
                 this.bots.splice(pos, 1);
             })
-            .catch(res => console.error('Failed to delete bot', res));
+            .catch(res => this.$log.error('Failed to delete bot', res));
     }
 
     send(bot) {
         let message = bot.message;
         bot.message = '';
-        this.botsService.send(bot, message)
-            .then(res => console.log(res))
-            .catch(res => console.error(res));
+        this.botService.send(bot, message)
+            .then(res => this.$log.debug(res))
+            .catch(res => this.$log.error(res));
     }
 
 
@@ -74,4 +84,4 @@ export class BotsCtrl {
             this.modal.field.unsaved = true;
         }
     }
-}
+}).name;

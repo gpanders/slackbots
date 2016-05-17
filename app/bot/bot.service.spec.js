@@ -1,10 +1,10 @@
-import Bots from './bots.module';
-import { BotsService } from './bots.service';
-import { Bot } from './bots.class';
+import { SlackService } from '../slack';
+import { BotService } from './bot.service';
+import { Bot } from './bot';
 
-describe('BotsService', () => {
+describe(BotService, () => {
 
-    let $httpBackend, $rootScope, $q, BotsService, UserService, SlackService;
+    let $httpBackend, $rootScope, $q, _botService, _userService;
     let bots = [];
 
     let user = {
@@ -15,11 +15,11 @@ describe('BotsService', () => {
         imageUrl: ''
     };
 
-    beforeEach(angular.mock.module(Bots.name));
+    beforeEach(angular.mock.module(BotService));
 
     beforeEach(() => {
         angular.mock.module($provide => {
-            $provide.service('SlackService', class SlackService {
+            $provide.service(SlackService, class {
                 constructor() {}
                 getUserInfo(userId) {
                     return $q.resolve(user);
@@ -28,14 +28,14 @@ describe('BotsService', () => {
         });
     });
 
-    beforeEach(angular.mock.inject((_BotsService_, _UserService_, _$httpBackend_, _$rootScope_, _$q_) => {
+    beforeEach(angular.mock.inject((_BotService_, _UserService_, _$httpBackend_, _$rootScope_, _$q_) => {
         $rootScope = _$rootScope_;
         $httpBackend = _$httpBackend_;
         $q = _$q_;
-        BotsService = _BotsService_;
-        UserService = _UserService_;
+        _botService = _BotService_;
+        _userService = _UserService_;
 
-        UserService.setUser(user);
+        _userService.setUser(user);
 
         $httpBackend.whenPOST(/^\/api\/bots$/)
             .respond((method, url, data, headers, params) => {
@@ -111,7 +111,7 @@ describe('BotsService', () => {
         let newBot = new Bot();
         newBot.botname = 'Test Bot';
         newBot.channel = 'U12345';
-        BotsService.create(newBot).then(bot => {
+        _botService.create(newBot).then(bot => {
             expect(angular.isDefined(bot._id)).to.equal(true);
             expect(bot.userId).to.equal(user.id);
             expect(bot.botname).to.equal(newBot.botname);
@@ -125,7 +125,7 @@ describe('BotsService', () => {
     it('should return newly created bot', done => {
         $httpBackend.expectGET(`/api/bots?userId=${user.id}`);
         let userBots = bots.filter(bot => bot.userId === user.id);
-        BotsService.getAll()
+        _botService.getAll()
             .then(bots => bots.filter(bot => !bot.isUser)).should.eventually.have.lengthOf(userBots.length).notify(done);
         $httpBackend.flush();
     });
@@ -134,34 +134,34 @@ describe('BotsService', () => {
         let update = bots[0];
         $httpBackend.expectPUT(`/api/bots/${update._id}`);
         update.index++;
-        BotsService.update(update).should.eventually.become(update).notify(done);
+        _botService.update(update).should.eventually.become(update).notify(done);
         $httpBackend.flush();
     });
 
     it('should send a message', done => {
         let bot = bots[0];
         $httpBackend.expectPOST(`/api/bots/${bot._id}/send`);
-        BotsService.send(bot, 'Test message').should.be.fulfilled.notify(done);
+        _botService.send(bot, 'Test message').should.be.fulfilled.notify(done);
         $httpBackend.flush();
     });
 
     it('should be able to delete a bot', () => {
         let id = bots[0]._id;
         $httpBackend.expectDELETE(`/api/bots/${id}`);
-        BotsService.delete(id).then(bot => bot._id).should.eventually.equal(id);
+        _botService.delete(id).then(bot => bot._id).should.eventually.equal(id);
         $httpBackend.flush();
     });
 
     it('should not return a bot after deleting', () => {
         $httpBackend.expectGET(`/api/bots?userId=${user.id}`);
-        BotsService.getAll().then(bots => bots.filter(bot => !bot.isUser)).should.eventually.have.lengthOf(0);
+        _botService.getAll().then(bots => bots.filter(bot => !bot.isUser)).should.eventually.have.lengthOf(0);
         $httpBackend.flush();
     });
 
     it('should not return any bots if no authenticated user', done => {
-        UserService.removeUser();
-        BotsService.getAll().should.be.rejected.notify(done);
+        _userService.removeUser();
+        _botService.getAll().should.be.rejected.notify(done);
         $rootScope.$digest();
     });
-    
+
 });

@@ -47,16 +47,10 @@
     "supernew": false,
     "validthis": false,
     "noyield": false,
-    "devel": true,
     "expr": true,
 
-    "browser": true,
     "node": true,
     "mocha": true,
 
-    "globals": {
-        "angular": false,
-        "$": false,
-        "expect": false
-    }
+    "globals": { }
 }

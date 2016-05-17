@@ -1,9 +1,8 @@
-require('bootstrap-loader');
+import 'bootstrap-loader';
 
-global.jQuery = global.$ = require('jquery');
-require('jquery-ui/sortable');
+import 'jquery-ui/sortable';
 
-require('angular');
-require('angular-storage');
-require('angular-ui-router');
-require('angular-ui-sortable');
+import 'angular';
+import 'angular-storage';
+import 'angular-ui-router';
+import 'angular-ui-sortable';

@@ -1,11 +1,23 @@
-export class HomeCtrl {
+import { BotService } from '../bot';
+import { SlackService } from '../slack';
+import { UserService } from '../user';
+import { TokenService } from '../token';
+
+export const HomeController = angular.module('HomeController', [
+    'ui.router',
+    BotService,
+    SlackService,
+    UserService,
+    TokenService
+])
+.controller('HomeController', class HomeController {
     /*@ngInject*/
-    constructor($state, SlackService, TokenService, UserService, BotsService) {
+    constructor($state, SlackService, TokenService, UserService, BotService) {
         this.$state = $state;
         this.slackService = SlackService;
         this.tokenService = TokenService;
         this.userService = UserService;
-        this.botsService = BotsService;
+        this.botService = BotService;
 
         let token = this.tokenService.get();
 
@@ -41,9 +53,9 @@ export class HomeCtrl {
     }
 
     signOut() {
-        this.botsService.bots = [];
+        this.botService.bots = [];
         this.tokenService.clear();
         this.userService.removeUser();
         this.$state.go('home');
     }
-}
+}).name;

@@ -1,8 +1,13 @@
-export class SlackService {
+import { UserService } from '../user';
+
+export const SlackService = angular.module('SlackService', [
+    UserService
+]).service('SlackService', class SlackService {
     /*@ngInject*/
-    constructor($http, $q, UserService) {
+    constructor($http, $q, $log, UserService) {
         this.$http = $http;
         this.$q = $q;
+        this.$log = $log;
         this.userService = UserService;
     }
 
@@ -30,11 +35,11 @@ export class SlackService {
                             resolve(res.data);
                         } else {
                             reject('Slack denied our request to post a message');
-                            console.error(res.data);
+                            this.$log.error(res.data);
                         }
                     }).catch(res => {
                         reject('Error posting message');
-                        console.error(res);
+                        this.$log.error(res);
                     });
                 })
                 .catch(() => reject('No authorized user found'));
@@ -59,7 +64,7 @@ export class SlackService {
                             reject('Slack denied our request to open an IM channel');
                         }
                     }).catch(res => {
-                        console.error(res);
+                        this.$log.error(res);
                         reject('Error opening IM channel');
                     });
                 })
@@ -78,4 +83,4 @@ export class SlackService {
                 .catch(() => reject('No authenticated user found'));
         });
     }
-}
+}).name;

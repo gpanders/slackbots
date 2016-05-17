@@ -1,4 +1,4 @@
-export default function($timeout) {
+export function FocusOn($timeout) {
     'ngInject';
     return {
         restrict: 'A',

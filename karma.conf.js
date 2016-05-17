@@ -1,16 +1,13 @@
 // Karma configuration
 // Generated on Tue May 10 2016 16:00:01 GMT-0500 (CDT)
-var webpackConfig = require('../webpack.config');
-
-webpackConfig.entry = {};
-webpackConfig.plugins = [];
-webpackConfig.cache = false;
+const webpack = require('webpack');
+const webpackConfig = require('./webpack.config');
 
 module.exports = function(config) {
   config.set({
 
     // base path that will be used to resolve all patterns (eg. files, exclude)
-    basePath: '../',
+    basePath: '',
 
 
     // frameworks to use
@@ -26,7 +23,9 @@ module.exports = function(config) {
 
     // list of files / patterns to load in the browser
     files: [
-      'test/index.js',
+        'app/vendor.js',
+        'app/test.js',
+        'app/**/*.spec.js',
     ],
 
 
@@ -38,10 +37,19 @@ module.exports = function(config) {
     // preprocess matching files before serving them to the browser
     // available preprocessors: https://npmjs.org/browse/keyword/karma-preprocessor
     preprocessors: {
-        'test/index.js': ['webpack']
+        'app/vendor.js': ['webpack'],
+        'app/test.js': ['webpack'],
+        'app/**/*.spec.js': ['webpack']
     },
 
-    webpack: webpackConfig,
+    webpack: {
+        resolve: webpackConfig.resolve,
+        module: webpackConfig.module,
+        plugins: [new webpack.ProvidePlugin({
+            $: 'jquery',
+            jQuery: 'jquery'
+        })]
+    },
 
     webpackMiddleware: {
         noInfo: true

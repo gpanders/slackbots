@@ -104,7 +104,6 @@ router.put('/:id', (req, res, next) => {
             }
 
             log.debug('Bot update successful');
-            log.info(bot);
             res.json(bot);
         });
     });
@@ -136,7 +135,7 @@ router.delete('/:id', (req, res, next) => {
                 log.error(`Error in DELETE /bots/delete/${req.params.id}: ${err}`);
                 return next(err);
             }
-            
+
             log.debug('Bot deletion successful');
             res.end();
         });

@@ -1,9 +1,8 @@
-import HomeTemplate from './home.template.html';
-import { HomeCtrl } from './home.controller';
+import { HomeController } from './home.controller';
 
-export default {
+export const HomeState = {
     url: '/',
-    template: HomeTemplate,
-    controller: 'HomeCtrl',
+    template: require('./home.module.html'),
+    controller: HomeController,
     controllerAs: 'vm'
 };

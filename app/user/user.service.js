@@ -1,4 +1,5 @@
-export class UserService {
+export const UserService = angular.module('UserService', [])
+.service('UserService', class UserService {
     /*@ngInject*/
     constructor($q) {
         this.$q = $q;
@@ -24,4 +25,4 @@ export class UserService {
     removeUser() {
         delete this.user;
     }
-}
+}).name;

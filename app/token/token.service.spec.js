@@ -1,27 +1,27 @@
-import Token from './token.module';
+import { TokenService } from './token.service';
 
-describe('TokenService', () => {
+describe(TokenService, () => {
 
-    let TokenService;
+    let _tokenService;
     let $rootScope;
 
-    beforeEach(angular.mock.module(Token.name));
+    beforeEach(angular.mock.module(TokenService));
 
     beforeEach(angular.mock.inject((_TokenService_, _$rootScope_) => {
-        TokenService = _TokenService_;
+        _tokenService = _TokenService_;
         $rootScope = _$rootScope_;
     }));
 
     it('should retrieve the token after saving it', done => {
         let token = 'abcd1234';
-        TokenService.save(token);
-        expect(TokenService.get()).to.equal(token);
+        _tokenService.save(token);
+        expect(_tokenService.get()).to.equal(token);
         done();
     });
 
     it('should retrieve null after token is cleared', done => {
-        TokenService.clear();
-        expect(TokenService.get()).to.equal(null);
+        _tokenService.clear();
+        expect(_tokenService.get()).to.be.null;
         done();
     });
 });
