@@ -8,12 +8,13 @@
     "start": "node --harmony dist/index.js",
     "test": "concurrently \"npm run test:browser\" \"npm run test:server\"",
     "test:watch": "karma start karma.conf.js",
-    "test:browser": "karma start --single-run=true karma.conf.js",
-    "test:server": "mocha -R spec test",
+    "test:browser": "NODE_ENV=test karma start --single-run=true karma.conf.js",
+    "test:server": "NODE_ENV=test mocha -R spec test",
     "postinstall": "npm run build",
     "build": "webpack"
   },
   "dependencies": {
+    "@slack/client": "^3.1.0",
     "angular": "^1.5.5",
     "angular-storage": "0.0.15",
     "angular-ui-router": "^0.2.18",
@@ -45,7 +46,6 @@
     "postcss-loader": "^0.8.2",
     "resolve-url-loader": "^1.4.3",
     "sass-loader": "^3.2.0",
-    "slackbots": "^0.5.1",
     "style-loader": "^0.13.1",
     "url-loader": "^0.5.7",
     "webpack": "^1.13.0"

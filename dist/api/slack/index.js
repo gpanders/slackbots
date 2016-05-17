@@ -1,10 +1,9 @@
 const express = require('express');
-const SlackBot = require('slackbots');
-const Logger = require('../../lib/logger');
+const WebClient = require('@slack/client').WebClient;
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
+let logger = require('../../lib/helpers').getLogger();
+let requireParams = require('../../lib/helpers').requireParams;
 
-let log = new Logger(NODE_ENV === 'production' ? 4 : (NODE_ENV === 'development' ? 1 : 2));
 let router = express.Router();
 
 /**
@@ -17,56 +16,97 @@ let router = express.Router();
  * @apiSuccess {Object} users Hash of user ids to user names
  */
 router.get('', (req, res) => {
+    let missingParams = requireParams(['token'], req);
+    if (missingParams) {
+        return res.status(400).end(missingParams);
+    }
+
+    let token = req.query.token;
+
     try {
-        let bot = new SlackBot({ token: req.query.token });
-        log.debug('Retrieving Slack information');
+        let web = new WebClient(token);
 
-        let slack = {
-            channels: {},
-            groups: {},
-            users: {}
-        };
+        web.auth.test().then(user => {
+            logger.debug(`Retrieving Slack information for ${user.name}`);
 
-        bot.on('error', err => {
-            log.error(err);
-            res.status(500).end(err);
-            bot.close();
-        });
+            let slack = {
+                channels: [],
+                groups: [],
+                users: []
+            };
 
-        bot.on('start', () => {
-            Promise.all([bot.getChannels(), bot.getGroups(), bot.getUsers()])
+            Promise.all([web.channels.list(), web.groups.list(), web.users.list()])
                 .then(values => {
                     values[0].channels
                         .filter(channel =>
                             channel['is_channel'] && channel['is_member'])
-                        .forEach(channel =>
-                            { slack.channels[channel.id] = `#${channel.name}`; });
+                        .forEach(channel => slack.channels.push({
+                            id: channel.id,
+                            name: channel.name
+                        }));
 
                     values[1].groups
                         .filter(group =>
-                            group['is_group'] &&
-                            !group['is_archived'] &&
-                            group['is_open'] &&
-                            !group['is_mpim'])
-                        .forEach(group =>
-                            { slack.groups[group.id] = group.name; });
+                            group['is_group'] && !group['is_archived'] && !group['is_mpim'])
+                        .forEach(group => slack.groups.push({
+                            id: group.id,
+                            name: group.name
+                        }));
 
                     values[2].members
                         .filter(member =>
                             !member.deleted && !member['is_bot'])
-                        .forEach(member =>
-                            { slack.users[member.id] = `@${member.name}`; });
+                        .forEach(member => slack.users.push({
+                            id: member.id,
+                            name: member.name
+                        }));
 
-                    log.debug(`Found ${Object.keys(slack.channels).length} channels, ${Object.keys(slack.groups).length} groups, and ${Object.keys(slack.users).length} users`);
+                    logger.debug(`Found ${slack.channels.length} channels, ${slack.groups.length} groups, and ${slack.users.length} users`);
                     return res.json(slack);
                 })
-                .catch(e => res.status(500).end(e))
-                .then(() => bot.close());
+                .catch(err => {
+                    logger.error(err);
+                    return res.status(500).end(err);
+                });
+        }).catch(err => {
+            logger.error(err);
+            return res.status(401).json(err);
         });
-    } catch (e) {
-        log.error(e);
-        return res.status(500).end(e);
+
+    } catch (err) {
+        logger.error(err);
+        return res.status(500).end(err);
     }
+});
+
+/**
+ * @api {post} /api/slack/send Send a message as the authenticated user
+ * @apiName PostMessageAsUser
+ * @apiGroup Slack
+ */
+router.post('/send', (req, res, next) => {
+    let missingParams = requireParams(['token', 'message', 'channel'], req);
+    if (missingParams) {
+        return res.status(400).end(missingParams);
+    }
+
+    let token = req.body.token;
+    let message = req.body.message;
+    let channel = req.body.channel;
+
+    let web = new WebClient(token);
+
+    web.auth.test().then(() => {
+        web.chat.postMessage(channel, message, { 'as_user': true })
+            .then(data => res.json(data))
+            .catch(err => {
+                logger.error(err);
+                return res.status(500).json(err);
+            });
+    }).catch(err => {
+        logger.error(err);
+        return res.status(401).json(err);
+    });
 });
 
 /**
@@ -80,27 +120,39 @@ router.get('', (req, res) => {
  * @apiSuccess {String} imageUrl URL of user's profile image
  */
 router.get('/user', (req, res) => {
-    log.debug('Looking up user info');
-    try {
-        let bot = new SlackBot({ token: req.query.token });
+    let missingParams = requireParams(['token'], req);
+    if (missingParams) {
+        return res.status(400).end(missingParams);
+    }
 
-        bot.on('start', () => {
-            bot.getUser(bot.self.name)
-                .then(user => {
-                    log.debug(`Returning user info for ${bot.self.name}`);
+    let token = req.query.token;
+
+    try {
+        let web = new WebClient(token);
+
+        web.auth.test().then(user => {
+            web.users.info(user['user_id'])
+                .then(profile => {
+                    logger.debug(`Returning user info for ${profile.user.name}`);
                     return res.json({
-                        id: bot.self.id,
-                        name: bot.self.name,
-                        realName: user.profile['real_name'],
-                        imageUrl: user.profile['image_original']
+                        id: profile.user.id,
+                        name: profile.user.name,
+                        realName: profile.user['real_name'],
+                        imageUrl: profile.user.profile['image_original']
                     });
                 })
-                .catch(() => res.status(500).end())
-                .then(() => bot.close());
+                .catch(err => {
+                    logger.error(err);
+                    return res.status(500).end(err);
+                });
+        }).catch(err => {
+            logger.error(err);
+            return res.status(401).json(err);
         });
-    } catch (e) {
-        log.error(e);
-        return res.status(500).end(e);
+
+    } catch (err) {
+        logger.error(err);
+        return res.status(500).end(err);
     }
 });
 

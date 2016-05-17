@@ -1,13 +1,12 @@
 const express = require('express');
-const SlackBot = require('slackbots');
-const Logger = require('../../lib/logger');
+const WebClient = require('@slack/client').WebClient;
 
-const NODE_ENV = process.env.NODE_ENV || 'development';
-
-let log = new Logger(NODE_ENV === 'production' ? 4 : (NODE_ENV === 'development' ? 1 : 2));
+let logger = require('../../lib/helpers').getLogger();
+let requireParams = require('../../lib/helpers').requireParams;
 
 let Bot = require('../../models/Bot');
 let router = express.Router();
+
 
 /**
  * @apiDefine BotRequest
@@ -41,14 +40,19 @@ let router = express.Router();
  * @apiSuccess {Array} bots List of bots
  */
 router.get('', (req, res, next) => {
-    log.debug('Retrieving bots list');
+    let missingParams = requireParams(['userId'], req);
+    if (missingParams) {
+        return res.status(400).end(missingParams);
+    }
+
+    logger.debug('Retrieving bots list');
     Bot.find({ userId: req.query.userId }).sort({ index: 1 }).exec((err, bots) => {
         if (err) {
-            log.error(`Error in GET /bots/list: ${err}`);
+            logger.error(`Error in GET /bots/list: ${err}`);
             return next(err);
         }
 
-        log.debug(`Returning ${bots.length} bots`);
+        logger.debug(`Returning ${bots.length} bots`);
         return res.json(bots);
     });
 });
@@ -62,14 +66,43 @@ router.get('', (req, res, next) => {
  * @apiUse BotResponse
  */
 router.post('', (req, res, next) => {
-    log.debug('Creating new bot', req.body);
+    let missingParams = requireParams(['index', 'botname', 'userId'], req);
+    if (missingParams) {
+        return res.status(400).end(missingParams);
+    }
+
+    logger.debug('Creating new bot', req.body);
     Bot.create(req.body, (err, bot) => {
         if (err) {
-            log.error(`Error in POST /bots/create: ${err}`);
+            logger.error(`Error in POST /bots/create: ${err}`);
             return next(err);
         }
 
-        log.debug('Bot creation successful');
+        logger.debug('Bot creation successful');
+        return res.json(bot);
+    });
+});
+
+/**
+ * @api {get} /bots/:id Retreive a specific bot
+ * @apiName GetBot
+ * @apiGroup Bots
+ *
+ * @apiParam (Path Parameter) {String} id Unique object id of the bot to retreive
+ * @apiUse BotResponse
+ */
+router.get('/:id', (req, res, next) => {
+    logger.debug(`Retreiving bot with id=${req.params.id}`);
+    Bot.findById(req.params.id, (err, bot) => {
+        if (err) {
+            logger.error(err);
+            return next(err);
+        }
+
+        if (!bot) {
+            return res.status(404).end();
+        }
+
         return res.json(bot);
     });
 });
@@ -84,10 +117,10 @@ router.post('', (req, res, next) => {
  * @apiUse BotResponse
  */
 router.put('/:id', (req, res, next) => {
-    log.debug(`Updating bot with id=${req.params.id}`);
+    logger.debug(`Updating bot with id=${req.params.id}`);
     Bot.findById(req.params.id, (err, bot) => {
         if (err) {
-            log.error(`Error on PUT /bots/update/${req.params.id}: ${err}`);
+            logger.error(`Error on PUT /bots/update/${req.params.id}: ${err}`);
             return next(err);
         }
 
@@ -99,11 +132,11 @@ router.put('/:id', (req, res, next) => {
 
         bot.save((err, bot) => {
             if (err) {
-                log.error(`Error on PUT /bots/update/${req.params.id}: ${err}`);
+                logger.error(`Error on PUT /bots/update/${req.params.id}: ${err}`);
                 return next(err);
             }
 
-            log.debug('Bot update successful');
+            logger.debug('Bot update successful');
             res.json(bot);
         });
     });
@@ -119,10 +152,10 @@ router.put('/:id', (req, res, next) => {
  * @apiUse BotResponse
  */
 router.delete('/:id', (req, res, next) => {
-    log.debug(`Deleting bot with id=${req.params.id}`);
+    logger.debug(`Deleting bot with id=${req.params.id}`);
     Bot.findById(req.params.id, (err, bot) => {
         if (err) {
-            log.error(`Error in DELETE /bots/delete: ${err}`);
+            logger.error(`Error in DELETE /bots/delete: ${err}`);
             return next(err);
         }
 
@@ -132,11 +165,11 @@ router.delete('/:id', (req, res, next) => {
 
         bot.remove((err, bot) => {
             if (err) {
-                log.error(`Error in DELETE /bots/delete/${req.params.id}: ${err}`);
+                logger.error(`Error in DELETE /bots/delete/${req.params.id}: ${err}`);
                 return next(err);
             }
 
-            log.debug('Bot deletion successful');
+            logger.debug('Bot deletion successful');
             res.end();
         });
     });
@@ -154,45 +187,55 @@ router.delete('/:id', (req, res, next) => {
  * @apiSuccess {String} response Response from server
  */
 router.post('/:id/send', (req, res, next) => {
+    let missingParams = requireParams(['token', 'message', 'chanenl'], req);
+    if (missingParams) {
+        return res.status(400).end(missingParams);
+    }
+
     let id = req.params.id;
     let token = req.body.token;
     let message = req.body.message;
-    if (!token || !message) {
-        if (!token) { log.error('Missing required parameter: token'); }
-        if (!message) { log.error('Missing required parameter: message'); }
-        return res.status(400).end();
-    }
+    let channel = req.body.channel;
 
-    log.debug(`Sending message '${message}' for bot with id ${id}`);
+    logger.debug(`Sending message '${message}' for bot with id ${id}`);
 
     Bot.findById(req.params.id).exec((err, bot) => {
         if (!bot) {
-            log.error(`No bot with id ${id} found`);
+            logger.error(`No bot with id ${id} found`);
             return res.status(404).end();
         }
 
         if (err) {
-            log.error(err);
-            return res.status(500).end();
+            logger.error(err);
+            return res.status(500).json(err);
         }
 
         try {
-            let slackbot = new SlackBot({
-                token: token,
-                name: bot.botname
-            });
+            let web = new WebClient(token);
 
-            let params = { 'icon_url': bot.imageUrl };
+            let params = {
+                'username': bot.botname,
+                'icon_url': bot.imageUrl,
+            };
 
-            slackbot.on('start', () => {
-                slackbot.postMessage(bot.channel, message, params)
-                    .fail(data => res.status(500).json(data))
+            new Promise((resolve, reject) => {
+                if (bot.postAsSlackbot) { resolve(channel); }
+                else {
+                    web.im.open(channel)
+                        .then(data => resolve(data.channel.id));
+                }
+            }).then(channel => {
+                web.chat.postMessage(channel, message, params)
                     .then(data => res.json(data))
-                    .always(() => slackbot.close());
+                    .catch(err => {
+                        logger.error(err);
+                        res.status(500).json(err);
+                    });
             });
-        } catch (e) {
-            log.error(e);
-            return res.status(500).end();
+
+        } catch (err) {
+            logger.error(err);
+            return res.status(500).json(err);
         }
     });
 });

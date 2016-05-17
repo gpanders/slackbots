@@ -103,55 +103,19 @@ export const BotService = angular.module('BotService', [
         return this.$q((resolve, reject) => {
             this.userService.getUser()
                 .then(user => {
-                    this.$http.post(`/api/bots/${bot._id}/send`, {
-                        postAsSlackbot: bot.postAsSlackbot,
+                    let url = bot.isUser ?
+                        '/api/slack/send' :
+                        `/api/bots/${bot._id}/send`;
+
+                    this.$http.post(url, {
                         token: user.token,
-                        message: message
+                        message: message,
+                        channel: bot.channel
                     })
                     .then(res => resolve(res.data))
                     .catch(reject);
                 })
                 .catch(this._handleError(reject));
         });
-                /*
-                let promise = this.$q((resolve, reject) => {
-                    bot.message = '';
-                    if (bot.type === 'user') {
-                        // channel is user ID
-                        if (!bot.postAsSlackbot) {
-                            if (this.users[channel].im) {
-                                resolve(this.users[channel].im);
-                            } else {
-                                this.slackService.openIM(channel).then(resolve);
-                            }
-                        } else {
-                            resolve(channel);
-                        }
-                    } else {
-                        resolve(channel);
-                    }
-                });
-
-                promise.then(channel => {
-                    var data = {
-                        channel: channel,
-                        text: message,
-                        username: bot.botname,
-                        icon_url: bot.imageUrl,
-                        as_user: bot.isUser
-                    };
-
-                    if (bot.attachments) {
-                        data.attachments = JSON.stringify([{
-                            fallback: bot.attachments.fallback,
-                            image_url: bot.attachments.imageUrl
-                        }]);
-                    }
-
-                    this.slackService.postMessage(data)
-                        .catch(res => console.error(res));
-                });
-            });
-            */
     }
 }).name;

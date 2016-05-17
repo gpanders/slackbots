@@ -16,16 +16,67 @@ function createServer() {
     return app.listen(PORT);
 }
 
-describe('Slack API', () => {
-    let server;
+let server;
 
+describe('/api/slack', () => {
     beforeEach(() => server = createServer());
 
     afterEach(done => server.close(done));
 
-    it('returns a 500 with an invalid token', done => {
-        request(server)
-            .get('/api/slack?token=fake_token')
-            .expect(500, done);
+    describe('GET', () => {
+        it('returns a 401 with an invalid token', done => {
+            request(server)
+                .get('/api/slack?token=fake_token')
+                .expect(401, done);
+        });
+
+        it('returns a 400 with a missing token', done => {
+            request(server)
+                .get('/api/slack')
+                .expect(400, done);
+        });
+    });
+
+});
+
+describe('/api/slack/send', () => {
+
+    describe('POST', () => {
+        let body = {token: 'fake_token', message: 'Test', channel: 'U10234' };
+        it('returns a 401 with an invalid token', done => {
+            request(server)
+                .post('/api/slack/send')
+                .send(body)
+                .expect(401, done);
+        });
+
+        Object.keys(body).forEach(k => {
+            let _body = JSON.parse(JSON.stringify(body));
+            delete _body[k];
+            it(`returns a 400 with missing parameter: ${k}`, done => {
+                request(server)
+                    .post('/api/slack/send')
+                    .send(_body)
+                    .expect(400, done);
+            });
+        });
+
+    });
+
+});
+
+describe('/api/slack/user', () => {
+    describe('GET', () => {
+        it('returns a 401 with an invalid token', done => {
+            request(server)
+                .get('/api/slack/user?token=fake_token')
+                .expect(401, done);
+        });
+
+        it('returns a 400 with a missing token', done => {
+            request(server)
+                .get('/api/slack')
+                .expect(400, done);
+        });
     });
 });

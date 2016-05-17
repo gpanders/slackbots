@@ -32,80 +32,121 @@ const update = {
     postAsSlackbot: false
 };
 
+let server;
 
-describe('Bots API', () => {
-    let server;
+before(() => {
+    mongoose.connect(MONGO_URI);
+    mongoose.model('Bot').remove({ userId: TEST_USER_ID }).exec();
+});
 
-    before(() => {
-        mongoose.connect(MONGO_URI);
-        mongoose.model('Bot').find({ userId: TEST_USER_ID }).remove();
-    });
+after(() => mongoose.connection.close());
+
+describe('/api/bots', () => {
 
     beforeEach(() => server = createServer());
 
     afterEach(done => server.close(done));
 
-    it('creates a new bot', done => {
-        request(server)
-            .post('/api/bots')
-            .send(testBot)
-            .expect(200)
-            .end((err, res) => {
-                if (err) { return done(err); }
-                expect(res.body._id).to.be.defined;
-                expect(res.body.userId).to.equal(testBot.userId);
-                expect(res.body.botname).to.equal(testBot.botname);
-                expect(res.body.index).to.equal(testBot.index);
+    describe('POST', () => {
+        it('creates a new bot', done => {
+            request(server)
+                .post('/api/bots')
+                .send(testBot)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) { return done(err); }
+                    expect(res.body._id).to.be.defined;
+                    expect(res.body.userId).to.equal(testBot.userId);
+                    expect(res.body.botname).to.equal(testBot.botname);
+                    expect(res.body.index).to.equal(testBot.index);
 
-                testBot = res.body;
+                    testBot = res.body;
 
-                done();
+                    done();
+                });
+        });
+
+        Object.keys(testBot).forEach(k => {
+            let _body = JSON.parse(JSON.stringify(testBot)); // clone object
+            delete _body[k];
+            it(`returns a 400 with missing required parameter: ${k}`, done => {
+                request(server)
+                    .post('/api/bots')
+                    .send(_body)
+                    .expect(400, done);
             });
+        });
     });
 
-    it('retrieves newly created bot', done => {
-        request(server)
-            .get(`/api/bots?userId=${TEST_USER_ID}`)
-            .expect(200)
-            .end((err, res) => {
-                if (err) { return done(err); }
-                expect(res.body).to.have.lengthOf(1);
-                expect(res.body[0]).to.deep.equal(testBot);
-                done();
-            });
+    describe('GET', () => {
+        it('retrieves newly created bot', done => {
+            request(server)
+                .get(`/api/bots?userId=${TEST_USER_ID}`)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) { return done(err); }
+                    expect(res.body).to.have.lengthOf(1);
+                    expect(res.body[0]).to.deep.equal(testBot);
+                    done();
+                });
+        });
+
+        it('returns a 400 with missing required parameter: userId', done => {
+            request(server)
+                .get('/api/bots')
+                .expect(400, done);
+        });
     });
 
-    it('can update the bot', done => {
-        request(server)
-            .put(`/api/bots/${testBot._id}`)
-            .send(update)
-            .expect(200)
-            .end((err, res) => {
-                if (err) { return done(err); }
-                expect(res.body.index).to.equal(update.index);
-                expect(res.body.botname).to.equal(update.botname);
-                expect(res.body.postAsSlackbot).to.equal(update.postAsSlackbot);
-                done();
-            });
+});
+
+describe('/api/bots/:id', () => {
+
+    beforeEach(() => server = createServer());
+
+    afterEach(done => server.close(done));
+
+    describe('PUT', () => {
+        it('updates the bot', done => {
+            request(server)
+                .put(`/api/bots/${testBot._id}`)
+                .send(update)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) { return done(err); }
+                    expect(res.body.index).to.equal(update.index);
+                    expect(res.body.botname).to.equal(update.botname);
+                    expect(res.body.postAsSlackbot).to.equal(update.postAsSlackbot);
+                    done();
+                });
+        });
     });
 
-    it('correctly retrieves updated bot', done => {
-        request(server)
-            .get(`/api/bots?userId=${TEST_USER_ID}`)
-            .expect(200)
-            .end((err, res) => {
-                if (err) { return done(err); }
-                expect(res.body).to.have.lengthOf(1);
-                expect(res.body[0].index).to.equal(update.index);
-                expect(res.body[0].botname).to.equal(update.botname);
-                expect(res.body[0].postAsSlackbot).to.equal(update.postAsSlackbot);
-                done();
-            });
+    describe('GET', () => {
+        it('correctly retrieves updated bot', done => {
+            request(server)
+                .get(`/api/bots/${testBot._id}`)
+                .expect(200)
+                .end((err, res) => {
+                    if (err) { return done(err); }
+                    expect(res.body.index).to.equal(update.index);
+                    expect(res.body.botname).to.equal(update.botname);
+                    expect(res.body.postAsSlackbot).to.equal(update.postAsSlackbot);
+                    done();
+                });
+        });
     });
 
-    it('deletes the bot', done => {
-        request(server)
-            .delete(`/api/bots/${testBot._id}`)
-            .expect(200, done);
+    describe('DELETE', () => {
+        it('deletes the bot', done => {
+            request(server)
+                .delete(`/api/bots/${testBot._id}`)
+                .expect(200)
+                .end(() => {
+                    request(server)
+                        .get(`/api/bots/${testBot._id}`)
+                        .expect(404, done);
+                });
+        });
     });
 });
