@@ -1,4 +1,6 @@
 machine:
+    environment:
+        NODE_ENV: staging
     node:
         version: 6.1.0
 
