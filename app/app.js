@@ -2,7 +2,10 @@ import { HomeModule, HomeState } from './home';
 import { BotsModule, BotsState } from './bots';
 
 export default angular.module('slackbots', [
+    // External dependencies
     'ui.router',
+
+    // App dependencies
     HomeModule,
     BotsModule
 ])

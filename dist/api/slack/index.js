@@ -27,7 +27,7 @@ router.get('', (req, res) => {
         let web = new WebClient(token);
 
         web.auth.test().then(user => {
-            logger.debug(`Retrieving Slack information for ${user.name}`);
+            logger.debug(`Retrieving Slack information for ${user.user}`);
 
             let slack = {
                 channels: [],
@@ -35,7 +35,7 @@ router.get('', (req, res) => {
                 users: []
             };
 
-            Promise.all([web.channels.list(), web.groups.list(), web.users.list()])
+            return Promise.all([web.channels.list(), web.groups.list(), web.users.list()])
                 .then(values => {
                     values[0].channels
                         .filter(channel =>

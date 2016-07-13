@@ -24,9 +24,9 @@ export const BotService = angular.module('BotService', [
 
     updateIndices() {
         this.bots.forEach((bot, i) => {
-            if (bot.index !== +i) {
-                bot.index = +i;
-                this.update(bot);
+            if (bot.index !== i) {
+                bot.index = i;
+                if (bot._id) { this.update(bot); }
             }
         });
     }
