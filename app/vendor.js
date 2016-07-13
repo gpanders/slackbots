@@ -1,6 +1,6 @@
 import 'bootstrap-loader';
 
-import 'jquery-ui/sortable';
+import 'jquery-ui/ui/widgets/sortable';
 
 import 'angular';
 import 'angular-storage';
