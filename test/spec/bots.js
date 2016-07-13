@@ -150,3 +150,32 @@ describe('/api/bots/:id', () => {
         });
     });
 });
+
+describe('/api/bots/:id/send', () => {
+
+    beforeEach(() => server = createServer());
+
+    afterEach(done => server.close(done));
+
+    describe('POST', () => {
+        let body = { token: 'blah', channel: 'U12345', message: 'Test' };
+
+        it('returns a 401 with an invalid token', done => {
+            request(server)
+                .post(`/api/bots/${testBot._id}/send`)
+                .send(body)
+                .expect(401, done);
+        });
+
+        Object.keys(body).forEach(k => {
+            let _body = JSON.parse(JSON.stringify(body)); // clone object
+            delete _body[k];
+            it(`returns a 400 with missing required parameter: ${k}`, done => {
+                request(server)
+                    .post('/api/bots')
+                    .send(_body)
+                    .expect(400, done);
+            });
+        });
+    })
+})

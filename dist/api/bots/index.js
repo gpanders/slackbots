@@ -187,7 +187,7 @@ router.delete('/:id', (req, res, next) => {
  * @apiSuccess {String} response Response from server
  */
 router.post('/:id/send', (req, res, next) => {
-    let missingParams = requireParams(['token', 'message', 'chanenl'], req);
+    let missingParams = requireParams(['token', 'message', 'channel'], req);
     if (missingParams) {
         return res.status(400).end(missingParams);
     }
@@ -197,21 +197,21 @@ router.post('/:id/send', (req, res, next) => {
     let message = req.body.message;
     let channel = req.body.channel;
 
-    logger.debug(`Sending message '${message}' for bot with id ${id}`);
+    let web = new WebClient(token);
 
-    Bot.findById(req.params.id).exec((err, bot) => {
-        if (!bot) {
-            logger.error(`No bot with id ${id} found`);
-            return res.status(404).end();
-        }
+    web.auth.test().then(() => {
 
-        if (err) {
-            logger.error(err);
-            return res.status(500).json(err);
-        }
+        Bot.findById(req.params.id, (err, bot) => {
+            if (!bot) {
+                logger.error(`No bot with id ${id} found`);
+                return res.status(404).end();
+            }
 
-        try {
-            let web = new WebClient(token);
+            if (err) {
+                logger.error(err);
+                return res.status(500).json(err);
+            }
+
 
             let params = {
                 'username': bot.botname,
@@ -225,6 +225,7 @@ router.post('/:id/send', (req, res, next) => {
                         .then(data => resolve(data.channel.id));
                 }
             }).then(channel => {
+                logger.debug(`Sending message '${message}' for bot with id ${id} to channel ${channel}`);
                 web.chat.postMessage(channel, message, params)
                     .then(data => res.json(data))
                     .catch(err => {
@@ -232,12 +233,8 @@ router.post('/:id/send', (req, res, next) => {
                         res.status(500).json(err);
                     });
             });
-
-        } catch (err) {
-            logger.error(err);
-            return res.status(500).json(err);
-        }
-    });
+        });
+    }).catch(err => res.status(401).json(err));
 });
 
 module.exports = router;
