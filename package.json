@@ -2,7 +2,7 @@
   "name": "slackbots-app",
   "private": true,
   "engines": {
-    "node": "6.1.0"
+    "node": "6.3.0"
   },
   "scripts": {
     "start": "node --harmony dist/index.js",
